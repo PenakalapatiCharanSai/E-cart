@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartCart{% endblock %}</title>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- User Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/user/products" class="logo">
+            <i class="fas fa-shopping-bag" style="color: var(--primary);"></i> SmartCart
+        </a>
+        
+        <div class="nav-links">
+            <a href="/user/products"><i class="fas fa-store"></i> Shop</a>
+            
+            {% if session.get('user_id') %}
+                <a href="/user/my-orders"><i class="fas fa-box"></i> Orders</a>
+                <a href="/user/cart" style="position: relative;">
+                    <i class="fas fa-shopping-cart"></i> Cart
+                    <span id="nav-cart-count" class="cart-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                </a>
+                <a href="/user-dashboard"><i class="fas fa-user"></i> {{ session.get('user_name') }}</a>
+                <a href="/user-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="/user-login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="/user-register"><i class="fas fa-user-plus"></i> Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Flash Messages -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {% if category == 'success' %}<i class="fas fa-check-circle"></i>{% else %}<i class="fas fa-exclamation-circle"></i>{% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 SmartCart. Crafted with style.</p>
+    </footer>
+
+    <!-- Global Cart Script for Amazon Style Add to Cart -->
+    <script>
+    function showFlashMessage(message, category) {
+        const flashContainer = document.querySelector('.flash-messages');
+        if (!flashContainer) return;
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${category}`;
+        const icon = category === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+        alertDiv.innerHTML = `${icon} ${message}`;
+        flashContainer.appendChild(alertDiv);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+
+    function addToCart(productId) {
+        fetch(`/user/add-to-cart-ajax/${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.error) {
+                    if(data.error === "not_logged_in") {
+                        window.location.href = '/user-login';
+                    } else {
+                        showFlashMessage(data.message || data.error, "danger");
+                    }
+                } else {
+                    // Update cart count in navbar
+                    let badge = document.getElementById("nav-cart-count");
+                    if(badge) {
+                        badge.innerText = data.cart_count;
+                    }
+                    // Show dynamic flash message
+                    showFlashMessage(data.message, "success");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

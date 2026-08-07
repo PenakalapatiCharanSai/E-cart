@@ -1,0 +1,14 @@
+.env
+!.env.example
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+.vscode/
+.idea/
+.DS_Store
+static/uploads/product_images/
+static/uploads/admin_profiles/

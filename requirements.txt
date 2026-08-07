@@ -1,0 +1,7 @@
+Flask
+mysql-connector-python
+Flask-Mail
+bcrypt
+razorpay
+python-dotenv
+gunicorn

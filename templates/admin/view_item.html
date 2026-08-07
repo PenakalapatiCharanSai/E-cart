@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Product Details{% endblock %}
+{% block content %}
+
+<div class="form-card" style="max-width: 600px;">
+    <h2><i class="fas fa-info-circle"></i> Product Details</h2>
+
+    <div class="text-center mb-4">
+        <img src="/static/uploads/product_images/{{ product.image }}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    </div>
+
+    <div style="text-align: left; background: rgba(255,255,255,0.5); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <p><strong><i class="fas fa-tag" style="color:var(--primary-color); width: 20px;"></i> Name:</strong> {{ product.name }}</p>
+        <p><strong><i class="fas fa-align-left" style="color:var(--primary-color); width: 20px;"></i> Description:</strong> {{ product.description }}</p>
+        <p><strong><i class="fas fa-list" style="color:var(--primary-color); width: 20px;"></i> Category:</strong> {{ product.category }}</p>
+        <p><strong><i class="fas fa-rupee-sign" style="color:var(--primary-color); width: 20px;"></i> Price:</strong> ₹{{ product.price }}</p>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="/admin/item-list"><i class="fas fa-arrow-left"></i> Back to List</a>
+    </div>
+</div>
+{% endblock %}

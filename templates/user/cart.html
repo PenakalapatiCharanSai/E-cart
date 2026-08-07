@@ -1,0 +1,124 @@
+{% extends 'user_base.html' %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+<div style="background: var(--white); border-radius: 10px; padding: 30px; box-shadow: var(--shadow);">
+    <h2 style="margin-bottom: 25px; color: var(--text-dark);">Your Shopping Cart</h2>
+
+    {% if cart %}
+    <form action="/user/checkout" method="POST" id="checkout-form">
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all" checked></th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pid, item in cart.items() %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_items" value="{{ pid }}" class="item-checkbox" data-price="{{ item.price * item.quantity }}" checked>
+                        </td>
+                        <td style="display: flex; align-items: center; gap: 15px; text-align: left; padding-left: 30px;">
+                            <img src="/static/uploads/product_images/{{ item.image }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid var(--border); border-radius: 5px;">
+                            <strong>{{ item.name }}</strong>
+                        </td>
+                        <td>₹{{ item.price }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <a href="/user/cart/decrease/{{ pid }}" class="btn btn-secondary" style="padding: 2px 10px;">-</a>
+                                <span style="font-weight: 600;">{{ item.quantity }}</span>
+                                <a href="/user/cart/increase/{{ pid }}" class="btn btn-secondary" style="padding: 2px 10px;">+</a>
+                            </div>
+                        </td>
+                        <td style="font-weight: 600; color: #b12704;">₹{{ item.price * item.quantity }}</td>
+                        <td>
+                            <a href="/user/cart/remove/{{ pid }}" class="btn btn-danger" style="padding: 5px 12px; font-size: 14px;"><i class="fas fa-trash"></i> Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--border);">
+            <a href="/user/products" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+            
+            <div style="text-align: right;">
+                <div style="font-size: 24px; margin-bottom: 15px;">
+                    Grand Total: <strong style="color: #b12704;" id="grand-total-display">₹{{ grand_total }}</strong>
+                </div>
+                <button type="submit" class="btn"><i class="fas fa-check-circle"></i> Proceed to Checkout</button>
+            </div>
+        </div>
+    </form>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            const selectAll = document.getElementById('select-all');
+            const grandTotalDisplay = document.getElementById('grand-total-display');
+            const checkoutForm = document.getElementById('checkout-form');
+
+            function calculateTotal() {
+                let total = 0;
+                let anyChecked = false;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        total += parseFloat(cb.getAttribute('data-price'));
+                        anyChecked = true;
+                    }
+                });
+                grandTotalDisplay.innerText = '₹' + total.toFixed(2);
+                
+                // Disable submit button if nothing is checked
+                const submitBtn = checkoutForm.querySelector('button[type="submit"]');
+                if (anyChecked) {
+                    submitBtn.removeAttribute('disabled');
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                } else {
+                    submitBtn.setAttribute('disabled', 'true');
+                    submitBtn.style.opacity = '0.5';
+                    submitBtn.style.cursor = 'not-allowed';
+                }
+            }
+
+            // Individual checkboxes change
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function() {
+                    calculateTotal();
+                    // Update select all status
+                    selectAll.checked = Array.from(checkboxes).every(c => c.checked);
+                });
+            });
+
+            // Select all change
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    calculateTotal();
+                });
+            }
+
+            // Initial calculation
+            calculateTotal();
+        });
+    </script>
+    
+    {% else %}
+    <div style="text-align: center; padding: 40px;">
+        <i class="fas fa-shopping-cart" style="font-size: 60px; color: #ccc; margin-bottom: 20px;"></i>
+        <h3 style="margin-bottom: 20px;">Your cart is empty!</h3>
+        <a href="/user/products" class="btn"><i class="fas fa-store"></i> Browse Products</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

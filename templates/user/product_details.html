@@ -1,0 +1,28 @@
+{% extends 'user_base.html' %}
+
+{% block title %}{{ product.name }} - SmartCart{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <div class="details-image">
+        <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}">
+    </div>
+    <div class="details-info">
+        <h2>{{ product.name }}</h2>
+        <div class="category"><i class="fas fa-tag"></i> {{ product.category }}</div>
+        
+        <div class="price">₹{{ product.price }}</div>
+        
+        <p><strong>Description:</strong><br>{{ product.description }}</p>
+        
+        <div style="display: flex; gap: 15px; margin-top: 20px;">
+            {% if product.quantity > 0 %}
+                <button onclick="addToCart({{ product.product_id }})" class="btn"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+            {% else %}
+                <button class="btn btn-secondary" style="cursor: not-allowed; opacity: 0.7; background: #e53e3e; border-color: #e53e3e; color: white;" disabled><i class="fas fa-times-circle"></i> Out of Stock</button>
+            {% endif %}
+            <a href="/user/products" class="btn btn-secondary">Back to Products</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

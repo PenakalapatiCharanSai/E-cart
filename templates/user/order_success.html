@@ -1,0 +1,85 @@
+{% extends 'user_base.html' %}
+
+{% block title %}Order Successful{% endblock %}
+
+{% block content %}
+<div class="auth-card" style="max-width: 700px; text-align: left;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <i class="fas fa-check-circle" style="font-size: 60px; color: var(--success); margin-bottom: 15px;"></i>
+        <h2 style="color: var(--success); margin-bottom: 10px;">Your Order is Placed!</h2>
+        <p style="color: var(--text-light); font-size: 16px;">Thank you for shopping with <strong>SmartCart</strong>.</p>
+    </div>
+
+    <!-- Order Tracking Timeline -->
+    <div class="order-tracker" style="margin-bottom: 50px;">
+        <div class="tracker-step {% if order.order_status in ['Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered'] or order.order_status == None %}active{% endif %}">
+            <div class="step-icon"><i class="fas fa-clipboard-check"></i></div>
+            <div class="step-label">Order Placed</div>
+        </div>
+        <div class="tracker-step {% if order.order_status in ['Confirmed', 'Shipped', 'Out for Delivery', 'Delivered'] %}active{% endif %}">
+            <div class="step-icon"><i class="fas fa-thumbs-up"></i></div>
+            <div class="step-label">Order Confirmed</div>
+        </div>
+        <div class="tracker-step {% if order.order_status in ['Shipped', 'Out for Delivery', 'Delivered'] %}active{% endif %}">
+            <div class="step-icon"><i class="fas fa-box"></i></div>
+            <div class="step-label">Shipped</div>
+        </div>
+        <div class="tracker-step {% if order.order_status in ['Out for Delivery', 'Delivered'] %}active{% endif %}">
+            <div class="step-icon"><i class="fas fa-truck"></i></div>
+            <div class="step-label">Out for Delivery</div>
+        </div>
+        <div class="tracker-step {% if order.order_status == 'Delivered' %}active{% endif %}">
+            <div class="step-icon"><i class="fas fa-home"></i></div>
+            <div class="step-label">Delivered</div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px; background: var(--bg-main); padding: 20px; border-radius: 8px;">
+            <h3 style="margin-bottom: 15px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Order Details</h3>
+            <p style="margin-bottom: 8px;"><strong>Order ID:</strong> {{ order.order_id }}</p>
+            <p style="margin-bottom: 8px;"><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</p>
+            <p style="margin-bottom: 8px;"><strong>Amount Paid:</strong> ₹{{ order.amount }}</p>
+            <p style="margin-bottom: 0;"><strong>Order Date:</strong> {{ order.created_at }}</p>
+        </div>
+        
+        {% if address %}
+        <div style="flex: 1; min-width: 250px; background: var(--bg-main); padding: 20px; border-radius: 8px;">
+            <h3 style="margin-bottom: 15px; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Delivery Address</h3>
+            <p style="margin-bottom: 8px;"><strong>{{ address.full_name }}</strong></p>
+            <p style="margin-bottom: 8px; color: var(--text-light);">{{ address.phone }}</p>
+            <p style="margin-bottom: 8px; color: var(--text-light);">{{ address.street_address }}</p>
+            <p style="margin-bottom: 0; color: var(--text-light);">{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <h3 style="margin-bottom: 15px;">Order Summary</h3>
+    <div class="table-wrapper" style="margin-top: 0; box-shadow: none; border: 1px solid var(--border);">
+        <table class="table" style="font-size: 15px;">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td>{{ it.product_name }}</td>
+                    <td>{{ it.quantity }}</td>
+                    <td>{{ it.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap;">
+        <a href="/user/products" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+        <a href="/user/my-orders" class="btn btn-secondary"><i class="fas fa-box"></i> View My Orders</a>
+        <a href="/user/order-invoice/{{ order.order_id }}" class="btn" target="_blank"><i class="fas fa-file-invoice"></i> Download Invoice</a>
+    </div>
+</div>
+{% endblock %}

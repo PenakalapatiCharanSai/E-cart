@@ -1,0 +1,15 @@
+{% extends 'user_base.html' %}
+
+{% block title %}User Dashboard{% endblock %}
+
+{% block content %}
+<div class="details-container" style="flex-direction: column; align-items: center; text-align: center; margin-top: 50px;">
+    <h2 style="font-size: 36px; margin-bottom: 20px;">Welcome back, {{ user_name }}!</h2>
+    <p style="color: var(--text-light); font-size: 18px; margin-bottom: 30px;">What would you like to do today?</p>
+    
+    <div style="display: flex; gap: 20px;">
+        <a href="/user/products" class="btn"><i class="fas fa-store"></i> Browse Products</a>
+        <a href="/user/my-orders" class="btn btn-secondary"><i class="fas fa-box"></i> View My Orders</a>
+    </div>
+</div>
+{% endblock %}
