@@ -1,14 +1,214 @@
-{% extends 'base.html' %}
-{% block title %}SmartCart - Home{% endblock %}
-{% block content %}
-<div class="form-card text-center" style="max-width: 600px;">
-    <h2><i class="fas fa-door-open"></i> Welcome to SmartCart</h2>
-    <p class="mb-4" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6;">
-        Welcome to the SmartCart Admin Portal. <br>
-        Use the navigation bar above to log in, register, or access your dashboard.
-    </p>
-    <div style="font-size: 4rem; color: var(--primary-color); opacity: 0.8; margin-top: 30px;">
-        <i class="fas fa-chart-line"></i>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCart - Welcome</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3f37c9;
+            --secondary: #4cc9f0;
+            --admin-color: #f72585;
+            --admin-hover: #b5179e;
+            --text-main: #2b2d42;
+            --text-light: #8d99ae;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 100% 0%, #e0c3fc 0%, transparent 40%), 
+                              radial-gradient(circle at 0% 100%, #8ec5fc 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+        }
+
+        .portal-container {
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .portal-header {
+            margin-bottom: 50px;
+        }
+
+        .portal-header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--admin-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .portal-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-top: 15px;
+            font-weight: 400;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 50px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.4);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+        }
+
+        .icon-circle {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            margin-bottom: 25px;
+            transition: transform 0.4s ease;
+        }
+
+        .portal-card:hover .icon-circle {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .user-card .icon-circle {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .admin-card .icon-circle {
+            background: linear-gradient(135deg, #ff9e00, var(--admin-color));
+            box-shadow: 0 10px 20px rgba(247, 37, 133, 0.3);
+        }
+
+        .portal-card h2 {
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+            font-weight: 600;
+        }
+
+        .portal-card p {
+            color: var(--text-light);
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+        }
+
+        .btn-portal {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .user-card .btn-portal {
+            background-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .user-card:hover .btn-portal {
+            background-color: var(--primary-hover);
+        }
+
+        .admin-card .btn-portal {
+            background-color: var(--admin-color);
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.4);
+        }
+
+        .admin-card:hover .btn-portal {
+            background-color: var(--admin-hover);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header h1 {
+                font-size: 2.8rem;
+            }
+            .cards-grid {
+                gap: 25px;
+            }
+            .portal-card {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="portal-header">
+            <h1><i class="fas fa-shopping-cart"></i> SmartCart</h1>
+            <p>Welcome! Please select your portal to continue.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- User Portal -->
+            <a href="/user-login" class="portal-card user-card">
+                <div class="icon-circle">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h2>Shop as User</h2>
+                <p>Browse our premium collection, add items to your cart, and enjoy seamless checkout.</p>
+                <div class="btn-portal">Enter Store</div>
+            </a>
+
+            <!-- Admin Portal -->
+            <a href="/admin-login" class="portal-card admin-card">
+                <div class="icon-circle">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>Manage as Admin</h2>
+                <p>Access the dashboard to manage inventory, update product listings, and track orders.</p>
+                <div class="btn-portal">Admin Login</div>
+            </a>
+        </div>
     </div>
-</div>
-{% endblock %}
+
+</body>
+</html>
