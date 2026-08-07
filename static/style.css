@@ -380,3 +380,105 @@ p[style*="color:red"] {
 .mt-4 { margin-top: 20px; }
 .mb-4 { margin-bottom: 20px; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+
+/* =================================================================
+   RESPONSIVE DESIGN (Media Queries)
+================================================================= */
+
+/* Tablets & Small Laptops (max-width: 991px) */
+@media (max-width: 991px) {
+    main {
+        padding: 30px 15px;
+    }
+    
+    .content-wrapper {
+        padding: 30px;
+    }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+    header {
+        padding: 15px 20px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    main {
+        padding: 20px 10px;
+    }
+    
+    .content-wrapper {
+        padding: 25px 20px;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    /* Make tables horizontally scrollable */
+    div.table-responsive, .content-wrapper, body {
+        /* Ensure we don't break flex on body, but allow table scrolling inside wrappers */
+    }
+    
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+    
+    /* Form adjustments */
+    form[method="GET"] {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    form[method="GET"] input, 
+    form[method="GET"] select,
+    form[method="GET"] button {
+        width: 100%;
+    }
+    
+    .form-card {
+        padding: 25px 20px;
+        margin: 20px auto;
+    }
+    
+    /* Dashboard Grid */
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    }
+    
+    /* Flex utilities adjustment */
+    .flex-between {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .flex-between > * {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
+
+/* Extra Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .content-wrapper {
+        padding: 20px 15px;
+    }
+    
+    button, input[type="submit"], .btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        width: 100%; /* Full width buttons on small screens */
+    }
+}

@@ -455,3 +455,126 @@ footer {
 .tracker-step.active .step-label {
     color: var(--success);
 }
+
+/* =================================================================
+   RESPONSIVE DESIGN (Media Queries)
+================================================================= */
+
+/* Tablets & Small Laptops (max-width: 991px) */
+@media (max-width: 991px) {
+    .details-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .details-image {
+        width: 100%;
+    }
+    
+    .details-info {
+        width: 100%;
+    }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 15px 20px;
+        gap: 15px;
+    }
+    
+    .navbar .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .container {
+        padding: 0 15px;
+        margin: 20px auto;
+    }
+    
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filters-bar form {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .filters-bar input, .filters-bar select, .filters-bar button {
+        width: 100%;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+    }
+    
+    /* Make tables horizontally scrollable */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .order-tracker {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+        padding-left: 30px;
+    }
+    
+    .order-tracker::before {
+        top: 0;
+        bottom: 0;
+        left: 54px; /* Center with the 50px icon (30px padding + 25px half icon - 1px half border) */
+        width: 4px;
+        height: auto;
+    }
+    
+    .tracker-step {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        text-align: left;
+        width: 100%;
+    }
+    
+    .tracker-step .step-icon {
+        margin: 0;
+        flex-shrink: 0;
+    }
+    
+    .auth-card {
+        padding: 30px 20px;
+        margin: 30px auto;
+    }
+    
+    /* Make checkout side-by-side divs stack */
+    div[style*="display: flex; gap: 20px; flex-wrap: wrap;"] {
+        flex-direction: column;
+    }
+}
+
+/* Extra Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .navbar .logo {
+        font-size: 22px;
+    }
+    
+    .navbar .nav-links a {
+        font-size: 14px;
+    }
+    
+    .product-card .price {
+        font-size: 20px;
+    }
+    
+    .btn {
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+}
