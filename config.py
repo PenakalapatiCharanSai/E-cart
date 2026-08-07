@@ -10,13 +10,6 @@ load_dotenv()
 
 SECRET_KEY = os.environ.get("FLASK_SECRET_KEY", "your_secret_key")
 
-# MySQL Database
-DB_HOST = os.environ.get("MYSQLHOST", "localhost")
-DB_PORT = int(os.environ.get("MYSQLPORT", 3306))
-DB_USER = os.environ.get("MYSQLUSER", "root")
-DB_PASSWORD = os.environ.get("MYSQLPASSWORD", "")
-DB_NAME = os.environ.get("MYSQLDATABASE", "smartcart_db")
-
 # Email SMTP Settings
 MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
 MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))

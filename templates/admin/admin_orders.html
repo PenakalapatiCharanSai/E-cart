@@ -32,7 +32,7 @@
                 <div style="font-size: 12px; color: var(--text-muted);">{{ order.user_email }}</div>
             </td>
             <td style="font-weight: 600; color: #b12704;">₹{{ order.amount }}</td>
-            <td style="font-size: 14px;">{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '' }}</td>
+            <td style="font-size: 14px;">{{ order.created_at[:16] if order.created_at is string else (order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '') }}</td>
             <td>
                 {% if order.order_status == 'Placed' %}
                     <span style="background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>

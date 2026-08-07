@@ -12,3 +12,4 @@ __pycache__/
 .DS_Store
 static/uploads/product_images/
 static/uploads/admin_profiles/
+database/smartcart.db
