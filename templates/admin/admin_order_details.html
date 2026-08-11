@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Details #{{ order.order_id }} - SmartCart Admin{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--text-main); margin: 0;">
+            <i class="fas fa-file-invoice" style="color: var(--admin-primary);"></i> Order Details #{{ order.order_id }}
+        </h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Placed on {{ order.created_at }}</p>
+    </div>
+    <a href="/admin/orders" class="btn-admin btn-admin-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+    </a>
+</div>
+
+<!-- Main Details Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+    
+    <!-- Customer & Payment Summary Card -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--admin-primary); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <i class="fas fa-user"></i> Customer & Payment
+        </h4>
+        <p style="margin-bottom: 6px; font-size: 14px;"><strong>Customer:</strong> {{ order.user_name }}</p>
+        <p style="margin-bottom: 6px; font-size: 14px; color: var(--text-muted);"><strong>Email:</strong> {{ order.user_email }}</p>
+        <p style="margin-bottom: 6px; font-size: 14px;"><strong>Payment Status:</strong> <span style="color: var(--success); font-weight: 700; text-transform: uppercase;">{{ order.payment_status }}</span></p>
+        <p style="margin-bottom: 6px; font-size: 14px;"><strong>Razorpay Payment ID:</strong> <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ order.razorpay_payment_id or 'N/A' }}</code></p>
+        <p style="margin-bottom: 0; font-size: 16px; font-weight: 800; color: var(--text-main); margin-top: 10px;"><strong>Total Amount:</strong> ₹{{ order.amount }}</p>
+    </div>
+
+    <!-- Delivery Address Card -->
+    {% if address %}
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--admin-primary); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <i class="fas fa-map-marker-alt"></i> Shipping Address
+        </h4>
+        <p style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">{{ address.full_name }}</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Phone: {{ address.phone }}</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">{{ address.street_address }}</p>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;">{{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Order Status Controller Card -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-sm);">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--admin-primary); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            <i class="fas fa-truck"></i> Update Order Status
+        </h4>
+        <form action="/admin/update-order-status/{{ order.order_id }}" method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+            <label style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Select Fulfillment Stage:</label>
+            <select name="order_status" style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 14px; font-weight: 600; outline: none;">
+                <option value="Placed" {% if order.order_status == 'Placed' %}selected{% endif %}>Placed</option>
+                <option value="Confirmed" {% if order.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="Shipped" {% if order.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                <option value="Out for Delivery" {% if order.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+            </select>
+            <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; padding: 10px; font-size: 14px;">
+                <i class="fas fa-save"></i> Save Status Change
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Purchased Items Table Card -->
+<div class="table-card">
+    <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);">Purchased Items</h3>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Item ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th style="text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>#{{ item.product_id }}</td>
+                <td><strong>{{ item.product_name }}</strong></td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+                <td style="text-align: right; font-weight: 700; color: var(--text-main);">₹{{ item.price * item.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -4,12 +4,12 @@
 
 {% block content %}
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
     <div>
         <h2 style="font-size: 24px; font-weight: 800; color: var(--text-main); margin: 0;">
             <i class="fas fa-shopping-cart" style="color: var(--admin-primary);"></i> Customer Orders Management
         </h2>
-        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Update order fulfillment statuses and track payment records</p>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Update order fulfillment statuses and view customer purchase details</p>
     </div>
     <a href="/admin-dashboard" class="btn-admin btn-admin-secondary">
         <i class="fas fa-arrow-left"></i> Dashboard
@@ -25,7 +25,7 @@
                 <th>Amount</th>
                 <th>Date</th>
                 <th>Current Status</th>
-                <th style="text-align: right;">Update Status</th>
+                <th style="text-align: right;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -56,18 +56,23 @@
                     {% endif %}
                 </td>
                 <td style="text-align: right;">
-                    <form action="/admin/update-order-status/{{ order.order_id }}" method="POST" style="display: inline-flex; gap: 8px; align-items: center; margin: 0;">
-                        <select name="order_status" style="padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 13px; outline: none; background: #fff;">
-                            <option value="Placed" {% if order.order_status == 'Placed' %}selected{% endif %}>Placed</option>
-                            <option value="Confirmed" {% if order.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
-                            <option value="Shipped" {% if order.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
-                            <option value="Out for Delivery" {% if order.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
-                            <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
-                        </select>
-                        <button type="submit" class="btn-admin btn-admin-primary" style="padding: 6px 12px; font-size: 13px;">
-                            Update
-                        </button>
-                    </form>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                        <a href="/admin/view-order/{{ order.order_id }}" class="btn-admin btn-admin-secondary" style="padding: 6px 12px; font-size: 12px;">
+                            <i class="fas fa-eye"></i> Details
+                        </a>
+                        <form action="/admin/update-order-status/{{ order.order_id }}" method="POST" style="display: inline-flex; gap: 6px; align-items: center; margin: 0;">
+                            <select name="order_status" style="padding: 5px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 12px; outline: none; background: #fff;">
+                                <option value="Placed" {% if order.order_status == 'Placed' %}selected{% endif %}>Placed</option>
+                                <option value="Confirmed" {% if order.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="Shipped" {% if order.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                <option value="Out for Delivery" {% if order.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                            </select>
+                            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 5px 10px; font-size: 12px;">
+                                Save
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% else %}

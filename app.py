@@ -27,6 +27,15 @@ def add_static_cache_headers(response):
         response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
     return response
 
+# ------------------- STRICT ADMIN ACCESS SECURITY WALL -------------------
+@app.before_request
+def restrict_admin_access():
+    path = request.path
+    if path == '/admin-dashboard' or path.startswith('/admin/'):
+        if 'admin_id' not in session:
+            flash("Admin authentication required! Please sign in first.", "danger")
+            return redirect('/admin-login')
+
 # ------------------- RAZORPAY INIT -----------------------
 razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
@@ -1369,6 +1378,45 @@ def update_order_status(order_id):
         flash(f"Order #{order_id} status updated to {new_status}.", "success")
         
     return redirect('/admin/orders')
+
+# =================================================================
+# ROUTE: ADMIN VIEW ORDER DETAILS
+# =================================================================
+@app.route('/admin/view-order/<int:order_id>')
+def admin_view_order(order_id):
+    if 'admin_id' not in session:
+        flash("Admin authentication required! Please login.", "danger")
+        return redirect('/admin-login')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT o.*, u.name as user_name, u.email as user_email
+        FROM orders o
+        JOIN users u ON o.user_id = u.user_id
+        WHERE o.order_id = ?
+    """, (order_id,))
+    order = cursor.fetchone()
+
+    if not order:
+        cursor.close()
+        conn.close()
+        flash("Order not found.", "danger")
+        return redirect('/admin/orders')
+
+    cursor.execute("SELECT * FROM order_items WHERE order_id = ?", (order_id,))
+    items = cursor.fetchall()
+
+    address = None
+    if order.get('address_id'):
+        cursor.execute("SELECT * FROM addresses WHERE address_id = ?", (order['address_id'],))
+        address = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('admin/admin_order_details.html', order=order, items=items, address=address)
 
 # ------------------------- RUN APP ------------------------
 if __name__ == '__main__':
