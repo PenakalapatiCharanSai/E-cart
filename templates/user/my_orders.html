@@ -1,35 +1,61 @@
 {% extends 'user_base.html' %}
 
-{% block title %}My Orders{% endblock %}
+{% block title %}My Orders - SmartCart{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto; background: var(--white); padding: 30px; border-radius: 10px; box-shadow: var(--shadow);">
-    <h2 style="margin-bottom: 25px;"><i class="fas fa-box"></i> My Orders</h2>
+
+<div style="max-width: 960px; margin: 0 auto;">
+    <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 24px; color: var(--text-primary);">
+        <i class="fas fa-box" style="color: var(--brand-blue);"></i> Order History & Tracking
+    </h2>
 
     {% if orders|length == 0 %}
-        <div style="text-align: center; padding: 40px;">
-            <i class="fas fa-box-open" style="font-size: 60px; color: #ccc; margin-bottom: 20px;"></i>
-            <h3 style="margin-bottom: 20px;">You have not placed any orders yet.</h3>
-            <a href="/user/products" class="btn"><i class="fas fa-store"></i> Start Shopping</a>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 60px; text-align: center; box-shadow: var(--shadow-sm);">
+            <i class="fas fa-box-open" style="font-size: 54px; color: var(--border-dark); margin-bottom: 16px;"></i>
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">You haven't placed any orders yet.</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Explore top deals and start shopping now.</p>
+            <a href="/user/products" class="btn btn-buy-now" style="padding: 12px 24px;"><i class="fas fa-store"></i> Start Shopping</a>
         </div>
     {% else %}
         {% for order in orders %}
-        <div style="border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <div>
-                <h3 style="margin-bottom: 10px; color: var(--secondary);">Order #{{ order.order_id }}</h3>
-                <p style="margin-bottom: 5px; color: var(--text-light);"><i class="far fa-calendar-alt"></i> {{ order.created_at }}</p>
-                <p style="margin-bottom: 0;"><strong>Status:</strong> <span style="color: var(--success); text-transform: capitalize;"><i class="fas fa-check-circle"></i> {{ order.payment_status }}</span></p>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                    <span style="font-size: 16px; font-weight: 800; color: var(--text-primary);">Order #{{ order.order_id }}</span>
+                    {% if order.order_status == 'Placed' or order.order_status == 'Confirmed' %}
+                        <span class="stock-badge in-stock" style="position: static; font-size: 12px;"><i class="fas fa-clock"></i> {{ order.order_status }}</span>
+                    {% elif order.order_status == 'Shipped' or order.order_status == 'Out for Delivery' %}
+                        <span class="stock-badge in-stock" style="position: static; background: #e0f2fe; color: #0284c7; font-size: 12px;"><i class="fas fa-truck"></i> {{ order.order_status }}</span>
+                    {% elif order.order_status == 'Delivered' %}
+                        <span class="stock-badge in-stock" style="position: static; font-size: 12px;"><i class="fas fa-check-circle"></i> Delivered</span>
+                    {% else %}
+                        <span class="stock-badge in-stock" style="position: static; font-size: 12px;"><i class="fas fa-check-circle"></i> {{ order.payment_status | title }}</span>
+                    {% endif %}
+                </div>
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">
+                    <i class="far fa-calendar-alt"></i> Placed on {{ order.created_at }}
+                </div>
+                {% if order.razorpay_payment_id %}
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        Txn ID: <code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ order.razorpay_payment_id }}</code>
+                    </div>
+                {% endif %}
             </div>
-            
-            <div style="text-align: right;">
-                <div style="font-size: 24px; font-weight: 700; color: #b12704; margin-bottom: 15px;">₹{{ order.amount }}</div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <a href="/user/order-success/{{ order.order_id }}" class="btn btn-secondary"><i class="fas fa-eye"></i> Details</a>
-                    <a href="/user/order-invoice/{{ order.order_id }}" class="btn" target="_blank"><i class="fas fa-file-invoice"></i> Invoice</a>
+
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-size: 22px; font-weight: 800; color: var(--text-primary);">₹{{ order.amount }}</div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="/user/order-success/{{ order.order_id }}" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px;">
+                        <i class="fas fa-eye"></i> Details
+                    </a>
+                    <a href="/user/order-invoice/{{ order.order_id }}" class="btn btn-add-cart" target="_blank" style="padding: 8px 14px; font-size: 13px;">
+                        <i class="fas fa-file-invoice"></i> Invoice
+                    </a>
                 </div>
             </div>
         </div>
         {% endfor %}
     {% endif %}
 </div>
+
 {% endblock %}

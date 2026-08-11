@@ -1,214 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartCart - Welcome</title>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-hover: #3f37c9;
-            --secondary: #4cc9f0;
-            --admin-color: #f72585;
-            --admin-hover: #b5179e;
-            --text-main: #2b2d42;
-            --text-light: #8d99ae;
-            --bg-color: #f8f9fa;
-        }
+{% extends 'user_base.html' %}
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at 100% 0%, #e0c3fc 0%, transparent 40%), 
-                              radial-gradient(circle at 0% 100%, #8ec5fc 0%, transparent 40%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-main);
-        }
+{% block title %}SmartCart - Fast Delivery & Premium Quality{% endblock %}
 
-        .portal-container {
-            max-width: 900px;
-            width: 90%;
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
-        }
+{% block content %}
 
-        .portal-header {
-            margin-bottom: 50px;
-        }
-
-        .portal-header h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin: 0;
-            background: linear-gradient(135deg, var(--primary), var(--admin-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .portal-header p {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            margin-top: 15px;
-            font-weight: 400;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            margin-top: 20px;
-        }
-
-        .portal-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 50px 30px;
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.4);
-            text-decoration: none;
-            color: var(--text-main);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .portal-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.12);
-        }
-
-        .icon-circle {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: white;
-            margin-bottom: 25px;
-            transition: transform 0.4s ease;
-        }
-
-        .portal-card:hover .icon-circle {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .user-card .icon-circle {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
-        }
-
-        .admin-card .icon-circle {
-            background: linear-gradient(135deg, #ff9e00, var(--admin-color));
-            box-shadow: 0 10px 20px rgba(247, 37, 133, 0.3);
-        }
-
-        .portal-card h2 {
-            font-size: 1.8rem;
-            margin: 0 0 15px 0;
-            font-weight: 600;
-        }
-
-        .portal-card p {
-            color: var(--text-light);
-            margin: 0 0 30px 0;
-            line-height: 1.6;
-        }
-
-        .btn-portal {
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .user-card .btn-portal {
-            background-color: var(--primary);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
-        }
-
-        .user-card:hover .btn-portal {
-            background-color: var(--primary-hover);
-        }
-
-        .admin-card .btn-portal {
-            background-color: var(--admin-color);
-            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.4);
-        }
-
-        .admin-card:hover .btn-portal {
-            background-color: var(--admin-hover);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .portal-header h1 {
-                font-size: 2.8rem;
-            }
-            .cards-grid {
-                gap: 25px;
-            }
-            .portal-card {
-                padding: 40px 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="portal-container">
-        <div class="portal-header">
-            <h1><i class="fas fa-shopping-cart"></i> SmartCart</h1>
-            <p>Welcome! Please select your portal to continue.</p>
-        </div>
-
-        <div class="cards-grid">
-            <!-- User Portal -->
-            <a href="/user-login" class="portal-card user-card">
-                <div class="icon-circle">
-                    <i class="fas fa-store"></i>
-                </div>
-                <h2>Shop as User</h2>
-                <p>Browse our premium collection, add items to your cart, and enjoy seamless checkout.</p>
-                <div class="btn-portal">Enter Store</div>
+<!-- Hero Promo Banner Card -->
+<div class="hero-slider-card">
+    <div class="hero-content">
+        <span class="hero-tag"><i class="fas fa-fire"></i> Festive Season</span>
+        <h1>Shop Top Quality Brands</h1>
+        <p>Discover latest electronics, fashion trends, home essentials, and gadgets with lightning-fast delivery.</p>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <a href="/user/products" class="btn btn-buy-now" style="padding: 12px 28px; font-size: 15px;">
+                <i class="fas fa-shopping-bag"></i> Shop Now
             </a>
-
-            <!-- Admin Portal -->
-            <a href="/admin-login" class="portal-card admin-card">
-                <div class="icon-circle">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <h2>Manage as Admin</h2>
-                <p>Access the dashboard to manage inventory, update product listings, and track orders.</p>
-                <div class="btn-portal">Admin Login</div>
+            <a href="/user/products?category=Electronics" class="btn" style="background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); padding: 12px 24px;">
+                <i class="fas fa-laptop"></i> Explore Electronics
             </a>
         </div>
     </div>
+</div>
 
-</body>
-</html>
+<!-- Trust Badges Bar -->
+<div class="trust-badges-bar">
+    <div class="trust-item">
+        <div class="trust-icon"><i class="fas fa-truck-fast"></i></div>
+        <div>
+            <div class="trust-title">Free Express Shipping</div>
+            <div class="trust-sub">On orders above ₹499</div>
+        </div>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon"><i class="fas fa-undo-alt"></i></div>
+        <div>
+            <div class="trust-title">7-Day Easy Returns</div>
+            <div class="trust-sub">Instant refund guarantee</div>
+        </div>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon"><i class="fas fa-shield-alt"></i></div>
+        <div>
+            <div class="trust-title">100% Authentic Products</div>
+            <div class="trust-sub">Directly from top brands</div>
+        </div>
+    </div>
+    <div class="trust-item">
+        <div class="trust-icon"><i class="fas fa-lock"></i></div>
+        <div>
+            <div class="trust-title">Secure Payments</div>
+            <div class="trust-sub">Razorpay encrypted checkout</div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Products Section -->
+<div class="section-header">
+    <h2 class="section-title"><i class="fas fa-fire" style="color: var(--accent-orange);"></i> Trending Products</h2>
+    <a href="/user/products" style="color: var(--brand-blue); text-decoration: none; font-weight: 700; font-size: 14px;">
+        View All Products <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <!-- Stock Tag -->
+        {% if product.quantity > 0 %}
+            <div class="stock-badge in-stock"><i class="fas fa-check"></i> In Stock</div>
+        {% else %}
+            <div class="stock-badge out-stock"><i class="fas fa-times"></i> Out of Stock</div>
+        {% endif %}
+
+        <!-- Product Image -->
+        <a href="/user/product/{{ product.product_id }}" class="product-img-wrapper">
+            <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}">
+        </a>
+
+        <!-- Category Tag -->
+        <div class="product-category-tag">{{ product.category }}</div>
+
+        <!-- Title -->
+        <a href="/user/product/{{ product.product_id }}" style="text-decoration: none; color: inherit;">
+            <div class="product-title">{{ product.name }}</div>
+        </a>
+
+        <!-- Price Row -->
+        <div class="price-row">
+            <span class="current-price">₹{{ product.price }}</span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-actions">
+            {% if product.quantity > 0 %}
+                <button onclick="addToCart({{ product.product_id }})" class="btn btn-add-cart" title="Add to Cart">
+                    <i class="fas fa-cart-plus"></i> Add
+                </button>
+                <button onclick="buyNow({{ product.product_id }})" class="btn btn-buy-now" title="Buy Now">
+                    <i class="fas fa-bolt"></i> Buy
+                </button>
+            {% else %}
+                <button class="btn btn-disabled" style="grid-column: span 2;" disabled>
+                    <i class="fas fa-ban"></i> Out of Stock
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1; background: var(--bg-card); border: 1px solid var(--border-light); padding: 50px; text-align: center; border-radius: var(--radius-md);">
+        <i class="fas fa-boxes" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3>No Products Available Yet</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">Check back soon or visit the Admin portal to add products.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Admin Portal Banner -->
+<div style="background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; box-shadow: var(--shadow-sm); margin-top: 40px;">
+    <div>
+        <h3 style="font-size: 20px; font-weight: 800; color: var(--text-primary);"><i class="fas fa-user-shield" style="color: #6366f1;"></i> Store Manager & Admin Access</h3>
+        <p style="color: var(--text-muted); margin-top: 4px; font-size: 14px;">Manage catalog inventory, process customer orders, and view revenue metrics.</p>
+    </div>
+    <div>
+        <a href="/admin-login" class="btn" style="background: #4f46e5; color: #fff; padding: 12px 24px; font-size: 14px;">
+            <i class="fas fa-tachometer-alt"></i> Go to Admin Dashboard
+        </a>
+    </div>
+</div>
+
+{% endblock %}

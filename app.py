@@ -60,7 +60,15 @@ def get_db_connection():
 # --------------------------------
 @app.route('/')
 def home():
-    return render_template("index.html")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT DISTINCT category FROM products")
+    categories = cursor.fetchall()
+    cursor.execute("SELECT * FROM products ORDER BY product_id DESC LIMIT 12")
+    featured_products = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template("index.html", products=featured_products, categories=categories)
 
 # ---------------------------------------------------------
 # ROUTE 1: ADMIN SIGNUP (SEND OTP)
@@ -215,8 +223,42 @@ def admin_dashboard():
         flash("Please login to access dashboard!", "danger")
         return redirect('/admin-login')
 
-    # Send admin name to dashboard UI
-    return render_template("admin/dashboard.html", admin_name=session['admin_name'])
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) as count FROM products")
+    total_products = cursor.fetchone()['count']
+
+    cursor.execute("SELECT COUNT(*) as count FROM orders")
+    total_orders = cursor.fetchone()['count']
+
+    cursor.execute("SELECT SUM(amount) as total FROM orders WHERE payment_status='paid'")
+    revenue_row = cursor.fetchone()
+    total_revenue = revenue_row['total'] if revenue_row and revenue_row['total'] is not None else 0
+
+    cursor.execute("SELECT COUNT(*) as count FROM products WHERE quantity <= 5")
+    low_stock_count = cursor.fetchone()['count']
+
+    cursor.execute("""
+        SELECT o.*, u.name as user_name, u.email as user_email
+        FROM orders o
+        JOIN users u ON o.user_id = u.user_id
+        ORDER BY o.created_at DESC LIMIT 5
+    """)
+    recent_orders = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "admin/dashboard.html",
+        admin_name=session['admin_name'],
+        total_products=total_products,
+        total_orders=total_orders,
+        total_revenue=total_revenue,
+        low_stock_count=low_stock_count,
+        recent_orders=recent_orders
+    )
 
 
 
@@ -711,15 +753,10 @@ def user_logout():
 
 
 # =================================================================
-# ROUTE: USER PRODUCT LISTING (SEARCH + FILTER)
+# ROUTE: USER PRODUCT LISTING (SEARCH + FILTER - Guest Access Allowed)
 # =================================================================
 @app.route('/user/products')
 def user_products():
-
-    # Optional: restrict only logged-in users
-    if 'user_id' not in session:
-        flash("Please login to view products!", "danger")
-        return redirect('/user-login')
 
     search = request.args.get('search', '')
     category_filter = request.args.get('category', '')
@@ -756,14 +793,10 @@ def user_products():
     )
 
 # =================================================================
-# ROUTE: USER PRODUCT DETAILS PAGE
+# ROUTE: USER PRODUCT DETAILS PAGE (Guest Access Allowed)
 # =================================================================
 @app.route('/user/product/<int:product_id>')
 def user_product_details(product_id):
-
-    if 'user_id' not in session:
-        flash("Please login!", "danger")
-        return redirect('/user-login')
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -788,7 +821,7 @@ def user_product_details(product_id):
 def add_to_cart(product_id):
 
     if 'user_id' not in session:
-        flash("Please login first!", "danger")
+        flash("Please login to add items to your cart and buy!", "warning")
         return redirect('/user-login')
 
     # Create cart if doesn't exist

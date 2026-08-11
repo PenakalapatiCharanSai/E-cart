@@ -1,27 +1,40 @@
 {% extends 'user_base.html' %}
 
-{% block title %}User Registration{% endblock %}
+{% block title %}Create Account - SmartCart{% endblock %}
 
 {% block content %}
-<div class="auth-card">
-    <h2>Create Account</h2>
+<div class="auth-container">
+    <div class="auth-header">
+        <div style="font-size: 28px; font-weight: 800; color: var(--brand-blue); margin-bottom: 8px;">
+            <i class="fas fa-shopping-bag"></i> Smart<span>Cart</span>
+        </div>
+        <h2>Create Your Account</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Sign up to enjoy seamless checkout & order tracking</p>
+    </div>
+
     <form method="POST" action="/user-register">
         <div class="form-group">
-            <label>Name</label>
-            <input type="text" name="name" placeholder="Enter your full name" required>
+            <label><i class="fas fa-user"></i> Full Name</label>
+            <input type="text" name="name" placeholder="John Doe" required>
         </div>
+
         <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" placeholder="Enter your email" required>
+            <label><i class="fas fa-envelope"></i> Email Address</label>
+            <input type="email" name="email" placeholder="name@example.com" required>
         </div>
+
         <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" placeholder="Create a password" required>
+            <label><i class="fas fa-lock"></i> Password</label>
+            <input type="password" name="password" placeholder="Create a secure password" required>
         </div>
-        <button type="submit" class="btn btn-block">Register</button>
+
+        <button type="submit" class="btn btn-buy-now" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">
+            <i class="fas fa-user-plus"></i> Create Account
+        </button>
     </form>
-    <div class="auth-links">
-        <p>Already have an account? <a href="/user-login">Login</a></p>
+
+    <div style="margin-top: 24px; text-align: center; font-size: 13px; border-top: 1px solid var(--border-light); padding-top: 18px; color: var(--text-muted);">
+        Already have an account? <a href="/user-login" style="color: var(--brand-blue); font-weight: 700; text-decoration: none;">Sign In</a>
     </div>
 </div>
 {% endblock %}

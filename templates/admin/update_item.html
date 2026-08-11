@@ -1,51 +1,64 @@
 {% extends 'base.html' %}
-{% block title %}Update Product{% endblock %}
+
+{% block title %}Update Product - SmartCart Admin{% endblock %}
+
 {% block content %}
 
-<div class="form-card" style="max-width: 600px;">
-    <h2><i class="fas fa-edit"></i> Update Product</h2>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <p style="color:green;"><i class="fas fa-check-circle"></i> {{ message }}</p>
-      {% endfor %}
-    {% endwith %}
+<div class="form-card">
+    <div style="margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+        <h2 style="font-size: 22px; font-weight: 800; color: var(--text-main); margin: 0;">
+            <i class="fas fa-edit" style="color: var(--admin-primary);"></i> Edit Product #{{ product.product_id }}
+        </h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Update product parameters, quantity stock, or image</p>
+    </div>
 
     <form method="POST" action="/admin/update-item/{{ product.product_id }}" enctype="multipart/form-data">
         <div class="form-group">
             <label><i class="fas fa-tag"></i> Product Name</label>
             <input type="text" name="name" value="{{ product.name }}" required>
         </div>
-        <div class="form-group">
-            <label><i class="fas fa-align-left"></i> Description</label>
-            <textarea name="description" rows="3" required>{{ product.description }}</textarea>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+                <label><i class="fas fa-list"></i> Category</label>
+                <input type="text" name="category" value="{{ product.category }}" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-rupee-sign"></i> Price (₹)</label>
+                <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
+            </div>
         </div>
-        <div class="form-group">
-            <label><i class="fas fa-list"></i> Category</label>
-            <input type="text" name="category" value="{{ product.category }}" required>
-        </div>
-        <div class="form-group">
-            <label><i class="fas fa-rupee-sign"></i> Price</label>
-            <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
-        </div>
+
         <div class="form-group">
             <label><i class="fas fa-boxes"></i> Stock Quantity</label>
             <input type="number" name="quantity" value="{{ product.quantity }}" required>
         </div>
+
         <div class="form-group">
-            <label><i class="fas fa-image"></i> Old Image</label><br>
-            <img src="/static/uploads/product_images/{{ product.image }}" width="120" style="margin-bottom: 10px; border-radius: 8px;">
-        </div>
-        <div class="form-group">
-            <label><i class="fas fa-upload"></i> Choose New Image (Optional)</label>
-            <input type="file" name="image" accept="image/*">
+            <label><i class="fas fa-align-left"></i> Description</label>
+            <textarea name="description" rows="4" required>{{ product.description }}</textarea>
         </div>
 
-        <button type="submit" style="width: 100%; margin-top: 15px;"><i class="fas fa-save"></i> Update Product</button>
+        <div style="display: flex; gap: 20px; align-items: center; background: #f8fafc; padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 20px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">CURRENT IMAGE</label>
+                <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid var(--border); border-radius: 6px; background: #fff; padding: 4px;">
+            </div>
+            <div style="flex: 1;">
+                <label><i class="fas fa-upload"></i> Upload Replacement Image (Optional)</label>
+                <input type="file" name="image" accept="image/*" style="margin-top: 6px;">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button type="submit" class="btn-admin btn-admin-primary" style="flex: 1; padding: 12px;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="/admin/item-list" class="btn-admin btn-admin-secondary">
+                Cancel
+            </a>
+        </div>
     </form>
-
-    <div class="mt-4 text-center">
-        <a href="/admin/item-list"><i class="fas fa-arrow-left"></i> Back to Product List</a>
-    </div>
 </div>
+
 {% endblock %}

@@ -1,27 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Verify OTP{% endblock %}
-{% block content %}
-<div class="form-card">
-    <h2><i class="fas fa-key"></i> Verify OTP</h2>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <p style="color:red;"><i class="fas fa-exclamation-circle"></i> {{ message }}</p>
-      {% endfor %}
-    {% endwith %}
+{% block title %}Verify OTP - SmartCart Admin{% endblock %}
+
+{% block content %}
+
+<div class="form-card" style="max-width: 440px; margin: 40px auto;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 36px; color: var(--admin-primary); margin-bottom: 8px;">
+            <i class="fas fa-key"></i>
+        </div>
+        <h2 style="font-size: 22px; font-weight: 800; color: var(--text-main); margin: 0;">Verify Email & Password</h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Enter OTP sent to your email and create a password</p>
+    </div>
 
     <form method="POST" action="/verify-otp">
         <div class="form-group">
-            <label><i class="fas fa-hashtag"></i> Enter OTP</label>
-            <input type="text" name="otp" placeholder="Enter the OTP sent to your email" required>
+            <label><i class="fas fa-hashtag"></i> Verification OTP</label>
+            <input type="text" name="otp" placeholder="6-digit OTP" required>
         </div>
 
         <div class="form-group">
             <label><i class="fas fa-lock"></i> Create Password</label>
-            <input type="password" name="password" placeholder="New Password" required>
+            <input type="password" name="password" placeholder="Create admin password" required>
         </div>
 
-        <button type="submit" style="width: 100%; margin-top: 10px;"><i class="fas fa-check-circle"></i> Verify & Register</button>
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">
+            <i class="fas fa-check-circle"></i> Complete Registration
+        </button>
     </form>
 </div>
+
 {% endblock %}

@@ -1,31 +1,124 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard{% endblock %}
+
+{% block title %}Admin Dashboard - SmartCart Store Management{% endblock %}
+
 {% block content %}
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p style="color:green;"><i class="fas fa-check-circle"></i> {{ message }}</p>
-  {% endfor %}
-{% endwith %}
-
-<div style="border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px;">
-    <h2 style="border: none; margin: 0; padding: 0;"><i class="fas fa-tachometer-alt"></i> Welcome, {{ admin_name }}</h2>
+<div style="margin-bottom: 24px;">
+    <h2 style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 4px;">
+        <i class="fas fa-chart-pie" style="color: var(--admin-primary);"></i> Welcome back, {{ admin_name }}!
+    </h2>
+    <p style="color: var(--text-muted); font-size: 14px;">Here is your real-time e-commerce performance overview.</p>
 </div>
 
-<p style="color: var(--text-muted);">This is your admin dashboard. Use the tools below to manage your store.</p>
+<!-- KPI Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-title">Total Paid Revenue</div>
+            <div class="kpi-val">₹{{ total_revenue }}</div>
+        </div>
+        <div class="kpi-icon" style="background: #ecfdf5; color: #10b981;">
+            <i class="fas fa-rupee-sign"></i>
+        </div>
+    </div>
 
-<div class="dashboard-grid">
-    <a href="/admin/profile" class="dashboard-card">
-        <i class="fas fa-id-badge" style="font-size: 2.5rem; margin-bottom: 15px; color: var(--primary-color);"></i>
-        My Profile
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-title">Total Orders</div>
+            <div class="kpi-val">{{ total_orders }}</div>
+        </div>
+        <div class="kpi-icon" style="background: #eff6ff; color: #3b82f6;">
+            <i class="fas fa-shopping-bag"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-title">Total Inventory Items</div>
+            <div class="kpi-val">{{ total_products }}</div>
+        </div>
+        <div class="kpi-icon" style="background: #f5f3ff; color: #8b5cf6;">
+            <i class="fas fa-boxes"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-title">Low Stock Alerts</div>
+            <div class="kpi-val" style="color: {% if low_stock_count > 0 %}var(--danger){% else %}var(--text-main){% endif %};">
+                {{ low_stock_count }}
+            </div>
+        </div>
+        <div class="kpi-icon" style="background: #fffbe6; color: #f59e0b;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Shortcuts -->
+<div style="display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap;">
+    <a href="/admin/add-item" class="btn-admin btn-admin-primary">
+        <i class="fas fa-plus-circle"></i> Add New Product
     </a>
-    <a href="/admin/add-item" class="dashboard-card">
-        <i class="fas fa-plus-square" style="font-size: 2.5rem; margin-bottom: 15px; color: #38a169;"></i>
-        Add Product
+    <a href="/admin/item-list" class="btn-admin btn-admin-secondary">
+        <i class="fas fa-boxes"></i> Manage Inventory
     </a>
-    <a href="/admin/item-list" class="dashboard-card">
-        <i class="fas fa-boxes" style="font-size: 2.5rem; margin-bottom: 15px; color: #d69e2e;"></i>
-        View All Products
+    <a href="/admin/orders" class="btn-admin btn-admin-secondary">
+        <i class="fas fa-shipping-fast"></i> Process Orders
     </a>
 </div>
+
+<!-- Recent Orders Section -->
+<div class="table-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: var(--text-main); margin: 0;">
+            <i class="fas fa-clock" style="color: var(--admin-primary);"></i> Recent Customer Orders
+        </h3>
+        <a href="/admin/orders" style="color: var(--admin-primary); font-weight: 700; font-size: 13px; text-decoration: none;">View All Orders &rarr;</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Payment Status</th>
+                <th>Order Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td><strong>#{{ order.order_id }}</strong></td>
+                <td>
+                    <div style="font-weight: 600;">{{ order.user_name }}</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">{{ order.user_email }}</div>
+                </td>
+                <td style="font-weight: 700; color: var(--text-main);">₹{{ order.amount }}</td>
+                <td>
+                    {% if order.payment_status == 'paid' %}
+                        <span style="background: #ecfdf5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Paid</span>
+                    {% else %}
+                        <span style="background: #fffbe6; color: #b45309; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">{{ order.payment_status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span style="font-weight: 600; font-size: 13px;">{{ order.order_status }}</span>
+                </td>
+                <td style="font-size: 13px; color: var(--text-muted);">{{ order.created_at }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                    No recent orders found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}

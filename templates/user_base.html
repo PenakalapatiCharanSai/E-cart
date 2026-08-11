@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SmartCart{% endblock %}</title>
+    <title>{% block title %}SmartCart - Modern Online Shopping{% endblock %}</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- User Stylesheet -->
@@ -12,40 +14,106 @@
 </head>
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <a href="/user/products" class="logo">
-            <i class="fas fa-shopping-bag" style="color: var(--primary);"></i> SmartCart
-        </a>
-        
-        <div class="nav-links">
-            <a href="/user/products"><i class="fas fa-store"></i> Shop</a>
-            
-            {% if session.get('user_id') %}
-                <a href="/user/my-orders"><i class="fas fa-box"></i> Orders</a>
-                <a href="/user/cart" style="position: relative;">
-                    <i class="fas fa-shopping-cart"></i> Cart
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-top">
+            <!-- Brand Logo -->
+            <a href="/" class="header-brand">
+                <div class="brand-logo">
+                    <i class="fas fa-shopping-bag"></i> Smart<span>Cart</span>
+                </div>
+            </a>
+
+            <!-- Prominent Search Bar -->
+            <form class="header-search" method="GET" action="/user/products">
+                <select name="category" class="search-cat-select">
+                    <option value="">All Categories</option>
+                    {% if categories %}
+                        {% for cat in categories %}
+                        <option value="{{ cat.category }}" {% if request.args.get('category') == cat.category %}selected{% endif %}>{{ cat.category }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <input type="text" name="search" class="search-input" placeholder="Search for products, brands and more..." value="{{ request.args.get('search', '') }}">
+                <button type="submit" class="search-btn" title="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Cart Button -->
+                <a href="/user/cart" class="cart-icon-btn">
+                    <i class="fas fa-shopping-cart" style="font-size: 18px;"></i>
+                    <span>Cart</span>
                     <span id="nav-cart-count" class="cart-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
                 </a>
-                <a href="/user-dashboard"><i class="fas fa-user"></i> {{ session.get('user_name') }}</a>
-                <a href="/user-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            {% else %}
-                <a href="/user-login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                <a href="/user-register"><i class="fas fa-user-plus"></i> Register</a>
-            {% endif %}
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <div class="container">
+                <!-- Three-Dots Menu Toggle Dropdown Button -->
+                <div class="menu-toggle-wrapper">
+                    <button type="button" class="three-dots-btn" id="menu-toggle-btn" title="More Menu Options">
+                        <i class="fas fa-ellipsis-vertical"></i>
+                    </button>
+                    
+                    <div class="three-dots-dropdown" id="three-dots-menu">
+                        <a href="/user/products" class="dropdown-item">
+                            <i class="fas fa-store" style="color: var(--brand-blue);"></i> Shop Products
+                        </a>
+
+                        {% if session.get('user_id') %}
+                            <a href="/user/my-orders" class="dropdown-item">
+                                <i class="fas fa-box" style="color: var(--brand-blue);"></i> My Orders
+                            </a>
+                            <a href="/user-dashboard" class="dropdown-item">
+                                <i class="fas fa-user-circle" style="color: var(--brand-blue);"></i> My Account ({{ session.get('user_name') }})
+                            </a>
+                            <a href="/user-logout" class="dropdown-item danger-item">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
+                            </a>
+                        {% else %}
+                            <a href="/user-login" class="dropdown-item">
+                                <i class="fas fa-sign-in-alt" style="color: var(--brand-blue);"></i> Sign In / Register
+                            </a>
+                        {% endif %}
+
+                        <div style="border-top: 1px solid var(--border-light); margin: 4px 0;"></div>
+                        
+                        <a href="/admin-login" class="dropdown-item" style="color: #6366f1;">
+                            <i class="fas fa-user-shield"></i> Admin Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Subnav Bar -->
+        <div class="category-subnav">
+            <a href="/user/products" class="cat-nav-link active"><i class="fas fa-th-large"></i> All Products</a>
+            <a href="/user/products?category=Electronics" class="cat-nav-link"><i class="fas fa-laptop"></i> Electronics</a>
+            <a href="/user/products?category=Fashion" class="cat-nav-link"><i class="fas fa-tshirt"></i> Fashion</a>
+            <a href="/user/products?category=Mobiles" class="cat-nav-link"><i class="fas fa-mobile-alt"></i> Mobiles</a>
+            <a href="/user/products?category=Home" class="cat-nav-link"><i class="fas fa-couch"></i> Home & Kitchen</a>
+            <a href="/user/products?category=Appliances" class="cat-nav-link"><i class="fas fa-plug"></i> Appliances</a>
+            <a href="/user/products" class="cat-nav-link" style="color: var(--accent-orange); font-weight: 700;"><i class="fas fa-bolt"></i> Today's Deals</a>
+        </div>
+    </header>
+
+    <!-- Main Body Container -->
+    <main class="main-container">
         <!-- Flash Messages -->
-        <div class="flash-messages">
+        <div class="flash-container">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
                         <div class="alert alert-{{ category }}">
-                            {% if category == 'success' %}<i class="fas fa-check-circle"></i>{% else %}<i class="fas fa-exclamation-circle"></i>{% endif %}
-                            {{ message }}
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -53,29 +121,80 @@
         </div>
 
         {% block content %}{% endblock %}
+    </main>
+
+    <!-- Mobile Sticky Navigation Bar -->
+    <div class="mobile-bottom-nav">
+        <a href="/" class="mobile-nav-item active">
+            <i class="fas fa-home" style="font-size: 18px;"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="mobile-nav-item">
+            <i class="fas fa-store" style="font-size: 18px;"></i>
+            <span>Shop</span>
+        </a>
+        <a href="/user/cart" class="mobile-nav-item">
+            <i class="fas fa-shopping-cart" style="font-size: 18px;"></i>
+            <span>Cart</span>
+        </a>
+        {% if session.get('user_id') %}
+            <a href="/user/my-orders" class="mobile-nav-item">
+                <i class="fas fa-box" style="font-size: 18px;"></i>
+                <span>Orders</span>
+            </a>
+        {% else %}
+            <a href="/user-login" class="mobile-nav-item">
+                <i class="fas fa-user" style="font-size: 18px;"></i>
+                <span>Login</span>
+            </a>
+        {% endif %}
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2026 SmartCart. Crafted with style.</p>
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <p>&copy; 2026 SmartCart E-Commerce. All rights reserved. Crafted with clean modern aesthetics.</p>
     </footer>
 
-    <!-- Global Cart Script for Amazon Style Add to Cart -->
+    <!-- Global Cart & Menu Script -->
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuBtn = document.getElementById('menu-toggle-btn');
+        const menuDropdown = document.getElementById('three-dots-menu');
+
+        if(menuBtn && menuDropdown) {
+            menuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menuDropdown.classList.toggle('show');
+                menuBtn.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function(e) {
+                if(!menuDropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+                    menuDropdown.classList.remove('show');
+                    menuBtn.classList.remove('active');
+                }
+            });
+        }
+    });
+
     function showFlashMessage(message, category) {
-        const flashContainer = document.querySelector('.flash-messages');
+        const flashContainer = document.querySelector('.flash-container');
         if (!flashContainer) return;
         
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${category}`;
-        const icon = category === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
-        alertDiv.innerHTML = `${icon} ${message}`;
+        let icon = '<i class="fas fa-check-circle"></i>';
+        if (category === 'warning') icon = '<i class="fas fa-exclamation-triangle"></i>';
+        if (category === 'danger') icon = '<i class="fas fa-exclamation-circle"></i>';
+        
+        alertDiv.innerHTML = `${icon} <span>${message}</span>`;
         flashContainer.appendChild(alertDiv);
         
-        // Auto remove after 3 seconds
         setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
+            alertDiv.style.opacity = '0';
+            alertDiv.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 3500);
     }
 
     function addToCart(productId) {
@@ -84,21 +203,44 @@
             .then(data => {
                 if(data.error) {
                     if(data.error === "not_logged_in") {
-                        window.location.href = '/user-login';
+                        showFlashMessage("Please login to add items to your cart and buy!", "warning");
+                        setTimeout(() => {
+                            window.location.href = '/user-login';
+                        }, 1000);
                     } else {
                         showFlashMessage(data.message || data.error, "danger");
                     }
                 } else {
-                    // Update cart count in navbar
                     let badge = document.getElementById("nav-cart-count");
                     if(badge) {
                         badge.innerText = data.cart_count;
                     }
-                    // Show dynamic flash message
-                    showFlashMessage(data.message, "success");
+                    showFlashMessage(data.message || "Added to Cart!", "success");
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                console.error("Error adding to cart:", error);
+            });
+    }
+
+    function buyNow(productId) {
+        fetch(`/user/add-to-cart-ajax/${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(data.error) {
+                    if(data.error === "not_logged_in") {
+                        showFlashMessage("Please login to buy items!", "warning");
+                        setTimeout(() => {
+                            window.location.href = '/user-login';
+                        }, 1000);
+                    } else {
+                        showFlashMessage(data.message || data.error, "danger");
+                    }
+                } else {
+                    window.location.href = '/user/cart';
+                }
+            })
+            .catch(error => console.error("Error in Buy Now:", error));
     }
     </script>
     {% block scripts %}{% endblock %}

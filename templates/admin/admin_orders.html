@@ -1,71 +1,84 @@
 {% extends 'base.html' %}
-{% block title %}Manage Orders{% endblock %}
+
+{% block title %}Manage Orders - SmartCart Admin{% endblock %}
+
 {% block content %}
 
-<div class="flex-between" style="border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 25px;">
-    <h2 style="border: none; margin: 0; padding: 0;"><i class="fas fa-shopping-cart"></i> Manage Orders</h2>
-    <a href="/admin-dashboard" class="btn" style="background: var(--text-muted);"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--text-main); margin: 0;">
+            <i class="fas fa-shopping-cart" style="color: var(--admin-primary);"></i> Customer Orders Management
+        </h2>
+        <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Update order fulfillment statuses and track payment records</p>
+    </div>
+    <a href="/admin-dashboard" class="btn-admin btn-admin-secondary">
+        <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
 </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <p style="color:green;"><i class="fas fa-check-circle"></i> {{ message }}</p>
-  {% endfor %}
-{% endwith %}
-
-<div style="overflow-x: auto; background: rgba(255,255,255,0.7); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft);">
-    <table style="margin-top: 0; border: none; background: transparent; width: 100%;">
-        <tr>
-            <th><i class="fas fa-hashtag"></i> Order ID</th>
-            <th><i class="fas fa-user"></i> Customer</th>
-            <th><i class="fas fa-rupee-sign"></i> Amount</th>
-            <th><i class="fas fa-calendar-alt"></i> Date</th>
-            <th><i class="fas fa-info-circle"></i> Status</th>
-            <th><i class="fas fa-cogs"></i> Action</th>
-        </tr>
-
-        {% for order in orders %}
-        <tr>
-            <td><strong>#{{ order.order_id }}</strong></td>
-            <td>
-                <div>{{ order.user_name }}</div>
-                <div style="font-size: 12px; color: var(--text-muted);">{{ order.user_email }}</div>
-            </td>
-            <td style="font-weight: 600; color: #b12704;">₹{{ order.amount }}</td>
-            <td style="font-size: 14px;">{{ order.created_at[:16] if order.created_at is string else (order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '') }}</td>
-            <td>
-                {% if order.order_status == 'Placed' %}
-                    <span style="background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% elif order.order_status == 'Confirmed' %}
-                    <span style="background: #cffafe; color: #0891b2; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% elif order.order_status == 'Shipped' %}
-                    <span style="background: #fef08a; color: #a16207; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% elif order.order_status == 'Out for Delivery' %}
-                    <span style="background: #fed7aa; color: #c2410c; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% elif order.order_status == 'Delivered' %}
-                    <span style="background: #bbf7d0; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% else %}
-                    <span style="background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">{{ order.order_status }}</span>
-                {% endif %}
-            </td>
-            <td>
-                <form action="/admin/update-order-status/{{ order.order_id }}" method="POST" style="display: flex; gap: 10px; align-items: center; margin: 0;">
-                    <select name="order_status" style="padding: 6px; border-radius: 5px; border: 1px solid var(--border-color); outline: none;">
-                        <option value="Placed" {% if order.order_status == 'Placed' %}selected{% endif %}>Placed</option>
-                        <option value="Confirmed" {% if order.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
-                        <option value="Shipped" {% if order.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
-                        <option value="Out for Delivery" {% if order.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
-                        <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
-                    </select>
-                    <button type="submit" class="btn" style="padding: 6px 12px; font-size: 0.85rem;">Update</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No orders found.</td>
-        </tr>
-        {% endfor %}
+<div class="table-card">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Current Status</th>
+                <th style="text-align: right;">Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.order_id }}</strong></td>
+                <td>
+                    <div style="font-weight: 700; color: var(--text-main);">{{ order.user_name }}</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">{{ order.user_email }}</div>
+                </td>
+                <td style="font-weight: 800; color: var(--text-main);">₹{{ order.amount }}</td>
+                <td style="font-size: 13px; color: var(--text-muted);">
+                    {{ order.created_at[:16] if order.created_at is string else (order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else '') }}
+                </td>
+                <td>
+                    {% if order.order_status == 'Placed' %}
+                        <span style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Placed</span>
+                    {% elif order.order_status == 'Confirmed' %}
+                        <span style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Confirmed</span>
+                    {% elif order.order_status == 'Shipped' %}
+                        <span style="background: #fffbe6; color: #b45309; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Shipped</span>
+                    {% elif order.order_status == 'Out for Delivery' %}
+                        <span style="background: #ffedd5; color: #c2410c; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Out for Delivery</span>
+                    {% elif order.order_status == 'Delivered' %}
+                        <span style="background: #ecfdf5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">Delivered</span>
+                    {% else %}
+                        <span style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px;">{{ order.order_status }}</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <form action="/admin/update-order-status/{{ order.order_id }}" method="POST" style="display: inline-flex; gap: 8px; align-items: center; margin: 0;">
+                        <select name="order_status" style="padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 13px; outline: none; background: #fff;">
+                            <option value="Placed" {% if order.order_status == 'Placed' %}selected{% endif %}>Placed</option>
+                            <option value="Confirmed" {% if order.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                            <option value="Shipped" {% if order.order_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="Out for Delivery" {% if order.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                            <option value="Delivered" {% if order.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                        </select>
+                        <button type="submit" class="btn-admin btn-admin-primary" style="padding: 6px 12px; font-size: 13px;">
+                            Update
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    No orders recorded yet.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
+
 {% endblock %}

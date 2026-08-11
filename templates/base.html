@@ -3,44 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SmartCart{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}Admin Portal - SmartCart{% endblock %}</title>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Admin Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        .nav-link { font-weight: 500; font-size: 0.95rem; color: var(--text-main); }
-        .nav-link:hover { color: var(--primary-hover); text-decoration: none; }
-        .nav-link::after { display: none !important; }
-        .nav-link.text-danger { color: #e53e3e; }
-        .nav-link.text-danger:hover { color: #c53030; }
-        header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-    </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
-    <header>
-        <a href="/" style="text-decoration: none; color: inherit; display: inline-block;">
-            <h1><i class="fas fa-shopping-cart" style="margin-right: 12px; animation: float 3s ease-in-out infinite; display: inline-block;"></i>SmartCart Admin Portal</h1>
+
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <a href="/admin-dashboard" class="admin-brand">
+            <i class="fas fa-user-shield" style="font-size: 24px;"></i> SmartCart <span>Admin</span>
         </a>
-        <nav style="display: flex; gap: 20px; align-items: center;">
-            <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
-            <a href="#" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
-            <a href="#" class="nav-link"><i class="fas fa-envelope"></i> Contact</a>
+
+        <div class="admin-nav">
+            <a href="/" class="admin-nav-link" target="_blank" title="View Storefront">
+                <i class="fas fa-store"></i> View Storefront
+            </a>
+
             {% if session.get('admin_id') %}
-                <a href="/admin-dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
-                <a href="/admin-logout" class="nav-link text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="/admin/profile" class="admin-nav-link">
+                    <i class="fas fa-user-circle"></i> {{ session.get('admin_name') }}
+                </a>
+                <a href="/admin-logout" class="admin-nav-link danger-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             {% else %}
-                <a href="/admin-login" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a>
-                <a href="/admin-signup" class="nav-link"><i class="fas fa-user-plus"></i> Register</a>
+                <a href="/admin-login" class="admin-nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="/admin-signup" class="admin-nav-link">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
             {% endif %}
-        </nav>
-    </header>
-    <main>
-        <div class="content-wrapper">
-            {% block content %}{% endblock %}
         </div>
-    </main>
-    <footer>
-        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </header>
+
+    <!-- Admin Layout Container -->
+    <div class="admin-layout">
+        {% if session.get('admin_id') %}
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-title">Main Navigation</div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="/admin-dashboard" class="{% if request.path == '/admin-dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/item-list" class="{% if '/item-list' in request.path %}active{% endif %}">
+                        <i class="fas fa-boxes"></i> Inventory Products
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/add-item" class="{% if '/add-item' in request.path %}active{% endif %}">
+                        <i class="fas fa-plus-circle"></i> Add New Product
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/orders" class="{% if '/orders' in request.path %}active{% endif %}">
+                        <i class="fas fa-shopping-cart"></i> Customer Orders
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="/admin/profile" class="{% if '/profile' in request.path %}active{% endif %}">
+                        <i class="fas fa-cog"></i> Profile & Settings
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        <main class="admin-content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="padding: 12px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: {% if category=='success' %}#ecfdf5{% else %}#fef2f2{% endif %}; color: {% if category=='success' %}#065f46{% else %}#991b1b{% endif %}; border: 1px solid {% if category=='success' %}#a7f3d0{% else %}#fecaca{% endif %};">
+                            <i class="fas fa-info-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Admin Footer -->
+    <footer class="admin-footer">
+        <p>&copy; 2026 SmartCart Store Management Portal. All rights reserved.</p>
     </footer>
+
+    {% block scripts %}{% endblock %}
 </body>
 </html>
