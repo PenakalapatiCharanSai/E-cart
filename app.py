@@ -18,6 +18,15 @@ import traceback
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
 
+# ------------------- FAST STATIC ASSET CACHING -------------------
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000
+
+@app.after_request
+def add_static_cache_headers(response):
+    if request.path.startswith('/static/'):
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    return response
+
 # ------------------- RAZORPAY INIT -----------------------
 razorpay_client = razorpay.Client(
     auth=(config.RAZORPAY_KEY_ID, config.RAZORPAY_KEY_SECRET)
