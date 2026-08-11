@@ -65,6 +65,19 @@
                     <span id="nav-cart-count" class="cart-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
                 </a>
 
+                <!-- Account / Sign In Direct Link -->
+                {% if session.get('user_id') %}
+                <a href="/user/account" class="cart-icon-btn" title="My Account Dashboard" style="text-decoration: none;">
+                    <i class="fas fa-user-circle" style="font-size: 18px; color: var(--brand-blue);"></i>
+                    <span>Account</span>
+                </a>
+                {% else %}
+                <a href="/user-login" class="cart-icon-btn" title="Sign In / Register" style="text-decoration: none;">
+                    <i class="fas fa-sign-in-alt" style="font-size: 18px; color: var(--brand-blue);"></i>
+                    <span>Sign In</span>
+                </a>
+                {% endif %}
+
                 <!-- Three-Dots Menu Toggle Dropdown Button -->
                 <div class="menu-toggle-wrapper">
                     <button type="button" class="three-dots-btn" id="menu-toggle-btn" title="More Menu Options">
@@ -77,11 +90,11 @@
                         </a>
 
                         {% if session.get('user_id') %}
+                            <a href="/user/account" class="dropdown-item">
+                                <i class="fas fa-user-circle" style="color: var(--brand-blue);"></i> My Account Dashboard
+                            </a>
                             <a href="/user/my-orders" class="dropdown-item">
                                 <i class="fas fa-box" style="color: var(--brand-blue);"></i> My Orders
-                            </a>
-                            <a href="/user-dashboard" class="dropdown-item">
-                                <i class="fas fa-user-circle" style="color: var(--brand-blue);"></i> My Account ({{ session.get('user_name') }})
                             </a>
                             <a href="/user-logout" class="dropdown-item danger-item">
                                 <i class="fas fa-sign-out-alt"></i> Sign Out
@@ -149,11 +162,18 @@
             <i class="fas fa-store" style="font-size: 18px;"></i>
             <span>Shop</span>
         </a>
-        <a href="/user/cart" class="mobile-nav-item">
+        <a href="/user/cart" class="mobile-nav-item" style="position: relative;">
             <i class="fas fa-shopping-cart" style="font-size: 18px;"></i>
             <span>Cart</span>
+            {% if session.get('cart') %}
+            <span class="cart-badge" style="position: absolute; top: -2px; right: 12px; font-size: 10px; padding: 2px 5px;">{{ session.get('cart')|length }}</span>
+            {% endif %}
         </a>
         {% if session.get('user_id') %}
+            <a href="/user/account" class="mobile-nav-item">
+                <i class="fas fa-user-circle" style="font-size: 18px;"></i>
+                <span>Account</span>
+            </a>
             <a href="/user/my-orders" class="mobile-nav-item">
                 <i class="fas fa-box" style="font-size: 18px;"></i>
                 <span>Orders</span>

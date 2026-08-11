@@ -780,13 +780,19 @@ def user_login():
         flash("Incorrect password!", "danger")
         return redirect('/user-login')
 
-    # Create user session
+    # Create user session (PRESERVING GUEST CART)
     session['user_id'] = user['user_id']
     session['user_name'] = user['name']
     session['user_email'] = user['email']
 
-    flash("Login successful!", "success")
-    return redirect('/user-dashboard')
+    next_page = request.args.get('next') or request.form.get('next')
+
+    if session.get('cart'):
+        flash(f"Welcome back, {user['name']}! Your cart items are saved and ready.", "success")
+        return redirect(next_page or '/user/cart')
+
+    flash(f"Login successful! Welcome back, {user['name']}.", "success")
+    return redirect(next_page or '/user/account')
 
 # =================================================================
 # ROUTE: USER DASHBOARD
@@ -882,10 +888,6 @@ def user_product_details(product_id):
 @app.route('/user/add-to-cart/<int:product_id>')
 def add_to_cart(product_id):
 
-    if 'user_id' not in session:
-        flash("Please login to add items to your cart and buy!", "warning")
-        return redirect('/user-login')
-
     # Create cart if doesn't exist
     if 'cart' not in session:
         session['cart'] = {}
@@ -902,20 +904,20 @@ def add_to_cart(product_id):
 
     if not product:
         flash("Product not found.", "danger")
-        return redirect(request.referrer)
+        return redirect(request.referrer or '/user/products')
 
     pid = str(product_id)
     
     # Check if out of stock completely
     if product['quantity'] <= 0:
         flash("Sorry, this product is out of stock.", "danger")
-        return redirect(request.referrer)
+        return redirect(request.referrer or '/user/products')
 
     # Check if requested quantity exceeds stock
     current_cart_qty = cart[pid]['quantity'] if pid in cart else 0
     if current_cart_qty + 1 > product['quantity']:
         flash(f"Cannot add more. Only {product['quantity']} items left in stock.", "danger")
-        return redirect(request.referrer)
+        return redirect(request.referrer or '/user/products')
 
     # If exists → increase quantity
     if pid in cart:
@@ -930,17 +932,19 @@ def add_to_cart(product_id):
 
     session['cart'] = cart
 
-    flash("Item added to cart!", "success")
-    return redirect(request.referrer)   # ⭐ Return to same page
+    if 'user_id' not in session:
+        flash("Item added to cart! Log in anytime to complete checkout.", "info")
+    else:
+        flash("Item added to cart!", "success")
+        
+    return redirect(request.referrer or '/user/cart')
+
 
 # =================================================================
 # ROUTE: AJAX ADD TO CART (AMAZON STYLE)
 # =================================================================
 @app.route('/user/add-to-cart-ajax/<int:product_id>')
 def add_to_cart_ajax(product_id):
-
-    if 'user_id' not in session:
-        return {"error": "not_logged_in"}, 401
 
     if 'cart' not in session:
         session['cart'] = {}
@@ -990,19 +994,18 @@ def add_to_cart_ajax(product_id):
 
 
 # =================================================================
-# ROUTE: VIEW CART
+# ROUTE: VIEW CART (Guest & Logged-in Access)
 # =================================================================
 @app.route('/user/cart')
 def view_cart():
-    if 'user_id' not in session:
-        flash("Please login to view your cart!", "danger")
-        return redirect('/user-login')
-
     cart = session.get('cart', {})
-    
     grand_total = sum(item['price'] * item['quantity'] for item in cart.values())
 
-    return render_template("user/cart.html", cart=cart, grand_total=grand_total)
+    return render_template(
+        "user/cart.html",
+        cart=cart,
+        grand_total=grand_total
+    )
 
 
 # =================================================================
@@ -1010,9 +1013,6 @@ def view_cart():
 # =================================================================
 @app.route('/user/cart/increase/<pid>')
 def increase_quantity(pid):
-    if 'user_id' not in session:
-        return redirect('/user-login')
-
     cart = session.get('cart', {})
     if pid in cart:
         cart[pid]['quantity'] += 1
@@ -1026,9 +1026,6 @@ def increase_quantity(pid):
 # =================================================================
 @app.route('/user/cart/decrease/<pid>')
 def decrease_quantity(pid):
-    if 'user_id' not in session:
-        return redirect('/user-login')
-
     cart = session.get('cart', {})
     if pid in cart:
         cart[pid]['quantity'] -= 1
@@ -1044,9 +1041,6 @@ def decrease_quantity(pid):
 # =================================================================
 @app.route('/user/cart/remove/<pid>')
 def remove_from_cart(pid):
-    if 'user_id' not in session:
-        return redirect('/user-login')
-
     cart = session.get('cart', {})
     if pid in cart:
         cart.pop(pid)
@@ -1061,8 +1055,8 @@ def remove_from_cart(pid):
 @app.route('/user/checkout', methods=['GET', 'POST'])
 def user_checkout():
     if 'user_id' not in session:
-        flash("Please login!", "danger")
-        return redirect('/user-login')
+        flash("Please sign in or register to complete your order.", "warning")
+        return redirect('/user-login?next=/user/cart')
 
     cart = session.get('cart', {})
 
