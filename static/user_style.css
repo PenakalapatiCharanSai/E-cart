@@ -45,6 +45,70 @@ body {
 }
 
 /* ==========================================
+   BUTTON UTILITY CLASSES
+========================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    outline: none;
+    background: var(--brand-blue);
+    color: #ffffff;
+}
+
+.btn:hover {
+    background: var(--brand-blue-dark);
+    color: #ffffff;
+}
+
+.btn-primary {
+    background: var(--brand-blue);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: var(--brand-blue-dark);
+}
+
+.btn-secondary {
+    background: #ffffff;
+    color: var(--text-primary);
+    border: 1px solid var(--border-dark);
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: var(--brand-blue);
+    color: var(--brand-blue);
+}
+
+.btn-buy-now {
+    background: var(--accent-orange);
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.btn-buy-now:hover {
+    background: var(--accent-orange-hover);
+    color: #ffffff;
+}
+
+.btn-disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* ==========================================
    TOP HEADER & NAVIGATION (LIGHT/WHITE THEME)
 ========================================== */
 .site-header {
