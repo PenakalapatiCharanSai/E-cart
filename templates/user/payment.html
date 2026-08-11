@@ -1,18 +1,40 @@
 {% extends 'user_base.html' %}
 
-{% block title %}Complete Payment{% endblock %}
+{% block title %}Complete Payment - SmartCart{% endblock %}
 
 {% block content %}
-<div class="auth-card" style="max-width: 500px;">
-    <h2>Complete Your Payment</h2>
-    <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
-    
-    <div style="font-size: 18px; margin-bottom: 30px;">
-        Total Amount Due: <br>
-        <span style="font-size: 32px; font-weight: 700; color: #b12704;">₹{{ amount }}</span>
+
+<div class="auth-container" style="max-width: 520px; margin: 40px auto; text-align: center;">
+    <div style="width: 60px; height: 60px; background: #eff6ff; color: var(--brand-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px;">
+        <i class="fas fa-shield-alt"></i>
     </div>
 
-    <button id="rzp-button" class="btn btn-block" style="font-size: 18px; padding: 15px;"><i class="fas fa-lock"></i> Pay Securely with Razorpay</button>
+    <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+        Complete Your Payment
+    </h2>
+    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 24px;">
+        100% Encrypted & Secure Razorpay Transaction
+    </p>
+
+    <!-- Payment Amount Card -->
+    <div style="background: #f8fafc; border: 1px dashed var(--border-dark); border-radius: var(--radius-md); padding: 20px; margin-bottom: 28px;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+            Total Amount Due
+        </div>
+        <div style="font-size: 34px; font-weight: 800; color: var(--brand-blue);">
+            ₹{{ amount }}
+        </div>
+    </div>
+
+    <!-- Prominent Payment Button -->
+    <button id="rzp-button" class="btn" style="width: 100%; background: var(--brand-blue); color: #ffffff; padding: 15px; font-size: 16px; font-weight: 800; border-radius: var(--radius-md); box-shadow: 0 4px 14px rgba(40, 116, 240, 0.3); transition: all 0.2s ease;">
+        <i class="fas fa-lock"></i> Pay ₹{{ amount }} Securely Now
+    </button>
+
+    <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <span><i class="fas fa-check-circle" style="color: var(--success);"></i> Credit / Debit Card</span>
+        <span><i class="fas fa-check-circle" style="color: var(--success);"></i> UPI / NetBanking</span>
+    </div>
 </div>
 
 <!-- Razorpay Checkout Script -->
@@ -27,7 +49,6 @@ var options = {
     "description": "Order Payment",
     "order_id": "{{ order_id }}",
     "handler": function (response){
-        // Build a small form and POST to server for verification
         var form = document.createElement("form");
         form.method = "POST";
         form.action = "/verify-payment";
