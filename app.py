@@ -85,6 +85,11 @@ def ensure_db_schema():
         if 'admin_id' not in columns:
             cursor.execute("ALTER TABLE products ADD COLUMN admin_id INTEGER DEFAULT 1")
             conn.commit()
+        
+        # Ensure any existing products without admin_id get set to 1
+        cursor.execute("UPDATE products SET admin_id = 1 WHERE admin_id IS NULL")
+        conn.commit()
+        
         cursor.close()
         conn.close()
     except Exception as e:
