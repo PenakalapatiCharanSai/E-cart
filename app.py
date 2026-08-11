@@ -1372,6 +1372,108 @@ def order_invoice(order_id):
     return render_template("user/invoice.html", order=order, items=items, address=address, user=user)
 
 # =================================================================
+# ROUTE: USER ACCOUNT DASHBOARD & PROFILE MANAGEMENT
+# =================================================================
+@app.route('/user/account', methods=['GET', 'POST'])
+@app.route('/user-dashboard', methods=['GET', 'POST'])
+def user_account():
+    if 'user_id' not in session:
+        flash("Please login to access your account dashboard.", "danger")
+        return redirect('/user-login')
+
+    user_id = session['user_id']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # If POST -> Update User Profile / Address Data
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'update_profile':
+            new_name = request.form.get('name')
+            new_email = request.form.get('email')
+            if new_name and new_email:
+                try:
+                    cursor.execute("UPDATE users SET name = ?, email = ? WHERE user_id = ?", (new_name, new_email, user_id))
+                    conn.commit()
+                    session['user_name'] = new_name
+                    session['user_email'] = new_email
+                    flash("Profile details updated successfully!", "success")
+                except sqlite3.IntegrityError:
+                    flash("Email address is already in use by another account.", "danger")
+
+        elif action == 'save_address':
+            full_name = request.form.get('full_name')
+            phone = request.form.get('phone')
+            street_address = request.form.get('street_address')
+            city = request.form.get('city')
+            state = request.form.get('state')
+            pincode = request.form.get('pincode')
+
+            # Check if address already exists
+            cursor.execute("SELECT address_id FROM addresses WHERE user_id = ?", (user_id,))
+            existing_address = cursor.fetchone()
+
+            if existing_address:
+                cursor.execute("""
+                    UPDATE addresses 
+                    SET full_name=?, phone=?, street_address=?, city=?, state=?, pincode=?, is_default=1
+                    WHERE address_id=? AND user_id=?
+                """, (full_name, phone, street_address, city, state, pincode, existing_address['address_id'], user_id))
+            else:
+                cursor.execute("""
+                    INSERT INTO addresses (user_id, full_name, phone, street_address, city, state, pincode, is_default)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                """, (user_id, full_name, phone, street_address, city, state, pincode))
+            
+            conn.commit()
+            flash("Shipping address saved successfully!", "success")
+
+        cursor.close()
+        conn.close()
+        return redirect('/user/account')
+
+    # Fetch User Details
+    cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+
+    # Fetch Address
+    cursor.execute("SELECT * FROM addresses WHERE user_id = ? ORDER BY is_default DESC LIMIT 1", (user_id,))
+    address = cursor.fetchone()
+
+    # Fetch Order Stats
+    cursor.execute("SELECT COUNT(*) as count FROM orders WHERE user_id = ?", (user_id,))
+    total_orders = cursor.fetchone()['count']
+
+    cursor.execute("SELECT SUM(amount) as total FROM orders WHERE user_id = ? AND payment_status = 'paid'", (user_id,))
+    spent_row = cursor.fetchone()
+    total_spent = spent_row['total'] if spent_row and spent_row['total'] is not None else 0
+
+    cursor.execute("SELECT COUNT(*) as count FROM orders WHERE user_id = ? AND (order_status = 'Delivered' OR payment_status = 'paid')", (user_id,))
+    completed_orders = cursor.fetchone()['count']
+
+    # Fetch Recent 5 Orders
+    cursor.execute("""
+        SELECT * FROM orders 
+        WHERE user_id = ? 
+        ORDER BY created_at DESC LIMIT 5
+    """, (user_id,))
+    recent_orders = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "user/user_account.html",
+        user=user,
+        address=address,
+        total_orders=total_orders,
+        total_spent=total_spent,
+        completed_orders=completed_orders,
+        recent_orders=recent_orders
+    )
+
+# =================================================================
 # ROUTE: ADMIN VIEW ALL ORDERS
 # =================================================================
 @app.route('/admin/orders')
