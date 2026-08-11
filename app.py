@@ -24,10 +24,13 @@ razorpay_client = razorpay.Client(
 )
 
 # ------------------- IMAGE UPLOAD PATH -------------------
-UPLOAD_FOLDER = 'static/uploads/product_images'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'product_images')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-ADMIN_UPLOAD_FOLDER = 'static/uploads/admin_profiles'
+ADMIN_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'admin_profiles')
+os.makedirs(ADMIN_UPLOAD_FOLDER, exist_ok=True)
 app.config['ADMIN_UPLOAD_FOLDER'] = ADMIN_UPLOAD_FOLDER
 
 
@@ -320,6 +323,7 @@ def add_item():
     filename = secure_filename(image_file.filename)
 
     # 4️⃣ Create full path
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
     # 5️⃣ Save image into folder
