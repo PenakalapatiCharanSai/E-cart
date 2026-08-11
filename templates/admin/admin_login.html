@@ -4,12 +4,23 @@
 
 {% block content %}
 
-<div class="form-card" style="max-width: 440px; margin: 40px auto;">
-    <div style="text-align: center; margin-bottom: 24px;">
-        <div style="font-size: 36px; color: var(--admin-primary); margin-bottom: 8px;">
+<div class="form-card" style="max-width: 420px; width: 92%; margin: 24px auto; padding: 28px 24px;">
+    
+    <!-- Mode Toggle Switcher -->
+    <div style="display: flex; background: #f1f5f9; padding: 4px; border-radius: 30px; margin-bottom: 24px;">
+        <a href="/admin-login" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 20px; text-decoration: none; background: #ffffff; color: var(--admin-primary); box-shadow: var(--shadow-sm);">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+        </a>
+        <a href="/admin-signup" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 13px; font-weight: 700; border-radius: 20px; text-decoration: none; color: var(--text-muted);">
+            <i class="fas fa-user-plus"></i> Register
+        </a>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 32px; color: var(--admin-primary); margin-bottom: 6px;">
             <i class="fas fa-user-shield"></i>
         </div>
-        <h2 style="font-size: 22px; font-weight: 800; color: var(--text-main); margin: 0;">Admin Portal Access</h2>
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--text-main); margin: 0;">Admin Portal Access</h2>
         <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Sign in with store manager credentials</p>
     </div>
 
@@ -24,7 +35,7 @@
             <input type="password" name="password" placeholder="Enter password" required>
         </div>
 
-        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 10px;">
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; padding: 12px; font-size: 15px; margin-top: 6px;">
             <i class="fas fa-sign-in-alt"></i> Sign In to Admin Panel
         </button>
     </form>

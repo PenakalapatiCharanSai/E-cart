@@ -14,8 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Admin Stylesheet (Preloaded for High Speed) -->
-    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.5" as="style">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.5">
+    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.6" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.6">
 
     <!-- Non-blocking FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -41,21 +41,46 @@
                 <i class="fas fa-store"></i> View Storefront
             </a>
 
-            {% if session.get('admin_id') %}
-                <a href="/admin/profile" class="admin-nav-link">
-                    <i class="fas fa-user-circle"></i> {{ session.get('admin_name') }}
-                </a>
-                <a href="/admin-logout" class="admin-nav-link danger-link">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            {% else %}
-                <a href="/admin-login" class="admin-nav-link">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </a>
-                <a href="/admin-signup" class="admin-nav-link">
-                    <i class="fas fa-user-plus"></i> Register
-                </a>
-            {% endif %}
+            <!-- Three-Dots Menu Toggle Dropdown Button -->
+            <div class="menu-toggle-wrapper">
+                <button type="button" class="three-dots-btn" id="admin-menu-toggle-btn" title="Admin Navigation Menu">
+                    <i class="fas fa-ellipsis-vertical"></i>
+                </button>
+
+                <div class="three-dots-dropdown" id="admin-three-dots-menu">
+                    <a href="/" class="dropdown-item" target="_blank">
+                        <i class="fas fa-store" style="color: var(--admin-primary);"></i> View Storefront
+                    </a>
+
+                    {% if session.get('admin_id') %}
+                        <a href="/admin-dashboard" class="dropdown-item">
+                            <i class="fas fa-chart-line" style="color: var(--admin-primary);"></i> Dashboard
+                        </a>
+                        <a href="/admin/item-list" class="dropdown-item">
+                            <i class="fas fa-boxes" style="color: var(--admin-primary);"></i> Inventory Products
+                        </a>
+                        <a href="/admin/add-item" class="dropdown-item">
+                            <i class="fas fa-plus-circle" style="color: var(--admin-primary);"></i> Add New Product
+                        </a>
+                        <a href="/admin/orders" class="dropdown-item">
+                            <i class="fas fa-shopping-cart" style="color: var(--admin-primary);"></i> Customer Orders
+                        </a>
+                        <a href="/admin/profile" class="dropdown-item">
+                            <i class="fas fa-user-circle" style="color: var(--admin-primary);"></i> Profile ({{ session.get('admin_name') }})
+                        </a>
+                        <a href="/admin-logout" class="dropdown-item danger-item">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </a>
+                    {% else %}
+                        <a href="/admin-login" class="dropdown-item">
+                            <i class="fas fa-sign-in-alt" style="color: var(--admin-primary);"></i> Admin Sign In
+                        </a>
+                        <a href="/admin-signup" class="dropdown-item">
+                            <i class="fas fa-user-plus" style="color: var(--admin-primary);"></i> Register Admin
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </header>
 
@@ -118,5 +143,27 @@
     </footer>
 
     {% block scripts %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('admin-menu-toggle-btn');
+            const dropdown = document.getElementById('admin-three-dots-menu');
+
+            if (toggleBtn && dropdown) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('show');
+                    toggleBtn.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('show');
+                        toggleBtn.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
