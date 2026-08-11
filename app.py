@@ -76,6 +76,22 @@ def get_db_connection():
     conn.execute('PRAGMA foreign_keys = ON')
     return conn
 
+def ensure_db_schema():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("PRAGMA table_info(products)")
+        columns = [col['name'] for col in cursor.fetchall()]
+        if 'admin_id' not in columns:
+            cursor.execute("ALTER TABLE products ADD COLUMN admin_id INTEGER DEFAULT 1")
+            conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        app.logger.error("DB Schema migration error: %s", str(e))
+
+ensure_db_schema()
+
 # --------------------------------
 # Home Route (First Flask Route)
 # --------------------------------
@@ -240,32 +256,44 @@ def admin_login():
 def admin_dashboard():
 
     # Protect dashboard → Only logged-in admin can access
-    if 'admin_id' not in session:
-        flash("Please login to access dashboard!", "danger")
-        return redirect('/admin-login')
-
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) as count FROM products")
+    cursor.execute("SELECT COUNT(*) as count FROM products WHERE admin_id = ?", (admin_id,))
     total_products = cursor.fetchone()['count']
 
-    cursor.execute("SELECT COUNT(*) as count FROM orders")
+    cursor.execute("""
+        SELECT COUNT(DISTINCT o.order_id) as count 
+        FROM orders o 
+        JOIN order_items oi ON o.order_id = oi.order_id 
+        JOIN products p ON oi.product_id = p.product_id 
+        WHERE p.admin_id = ?
+    """, (admin_id,))
     total_orders = cursor.fetchone()['count']
 
-    cursor.execute("SELECT SUM(amount) as total FROM orders WHERE payment_status='paid'")
+    cursor.execute("""
+        SELECT SUM(oi.price * oi.quantity) as total 
+        FROM orders o 
+        JOIN order_items oi ON o.order_id = oi.order_id 
+        JOIN products p ON oi.product_id = p.product_id 
+        WHERE o.payment_status='paid' AND p.admin_id = ?
+    """, (admin_id,))
     revenue_row = cursor.fetchone()
     total_revenue = revenue_row['total'] if revenue_row and revenue_row['total'] is not None else 0
 
-    cursor.execute("SELECT COUNT(*) as count FROM products WHERE quantity <= 5")
+    cursor.execute("SELECT COUNT(*) as count FROM products WHERE admin_id = ? AND quantity <= 5", (admin_id,))
     low_stock_count = cursor.fetchone()['count']
 
     cursor.execute("""
-        SELECT o.*, u.name as user_name, u.email as user_email
+        SELECT DISTINCT o.*, u.name as user_name, u.email as user_email
         FROM orders o
         JOIN users u ON o.user_id = u.user_id
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE p.admin_id = ?
         ORDER BY o.created_at DESC LIMIT 5
-    """)
+    """, (admin_id,))
     recent_orders = cursor.fetchall()
 
     cursor.close()
@@ -347,13 +375,14 @@ def add_item():
     # 5️⃣ Save image into folder
     image_file.save(image_path)
 
-    # 6️⃣ Insert product into database
+    # 6️⃣ Insert product into database with admin_id
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO products (name, description, category, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)",
-        (name, description, category, price, quantity, filename)
+        "INSERT INTO products (name, description, category, price, quantity, image, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (name, description, category, price, quantity, filename, admin_id)
     )
 
     conn.commit()
@@ -378,16 +407,17 @@ def item_list():
     search = request.args.get('search', '')
     category_filter = request.args.get('category', '')
 
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 1️⃣ Fetch category list for dropdown
-    cursor.execute("SELECT DISTINCT category FROM products")
+    # 1️⃣ Fetch category list for dropdown (filtered by admin_id)
+    cursor.execute("SELECT DISTINCT category FROM products WHERE admin_id = ?", (admin_id,))
     categories = cursor.fetchall()
 
     # 2️⃣ Build dynamic query based on filters
-    query = "SELECT * FROM products WHERE 1=1"
-    params = []
+    query = "SELECT * FROM products WHERE admin_id = ?"
+    params = [admin_id]
 
     if search:
         query += " AND name LIKE ?"
@@ -422,17 +452,18 @@ def view_item(item_id):
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
+    cursor.execute("SELECT * FROM products WHERE product_id = ? AND admin_id = ?", (item_id, admin_id))
     product = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
     if not product:
-        flash("Product not found!", "danger")
+        flash("Product not found or unauthorized access!", "danger")
         return redirect('/admin/item-list')
 
     return render_template("admin/view_item.html", product=product)
@@ -450,18 +481,19 @@ def update_item_page(item_id):
         flash("Please login!", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
     # Fetch product data
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
+    cursor.execute("SELECT * FROM products WHERE product_id = ? AND admin_id = ?", (item_id, admin_id))
     product = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
     if not product:
-        flash("Product not found!", "danger")
+        flash("Product not found or unauthorized access!", "danger")
         return redirect('/admin/item-list')
 
     return render_template("admin/update_item.html", product=product)
@@ -478,6 +510,8 @@ def update_item(item_id):
         flash("Please login!", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
+
     # 1️⃣ Get updated form data
     name = request.form['name']
     description = request.form['description']
@@ -490,11 +524,11 @@ def update_item(item_id):
     # 2️⃣ Fetch old product data
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM products WHERE product_id = ?", (item_id,))
+    cursor.execute("SELECT * FROM products WHERE product_id = ? AND admin_id = ?", (item_id, admin_id))
     product = cursor.fetchone()
 
     if not product:
-        flash("Product not found!", "danger")
+        flash("Product not found or unauthorized access!", "danger")
         return redirect('/admin/item-list')
 
     old_image_name = product['image']
@@ -525,8 +559,8 @@ def update_item(item_id):
     cursor.execute("""
         UPDATE products
         SET name=?, description=?, category=?, price=?, quantity=?, image=?
-        WHERE product_id=?
-    """, (name, description, category, price, quantity, final_image_name, item_id))
+        WHERE product_id=? AND admin_id=?
+    """, (name, description, category, price, quantity, final_image_name, item_id, admin_id))
 
     conn.commit()
     cursor.close()
@@ -546,15 +580,16 @@ def delete_item(item_id):
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # 1️⃣ Fetch product to get image name
-    cursor.execute("SELECT image FROM products WHERE product_id=?", (item_id,))
+    cursor.execute("SELECT image FROM products WHERE product_id=? AND admin_id=?", (item_id, admin_id))
     product = cursor.fetchone()
 
     if not product:
-        flash("Product not found!", "danger")
+        flash("Product not found or unauthorized access!", "danger")
         return redirect('/admin/item-list')
 
     image_name = product['image']
@@ -565,7 +600,7 @@ def delete_item(item_id):
         os.remove(image_path)
 
     # 2️⃣ Delete product from DB
-    cursor.execute("DELETE FROM products WHERE product_id=?", (item_id,))
+    cursor.execute("DELETE FROM products WHERE product_id=? AND admin_id=?", (item_id, admin_id))
     conn.commit()
 
     cursor.close()
@@ -1340,16 +1375,20 @@ def admin_orders():
         flash("Please login first!", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Fetch orders along with user details
+    # Fetch orders containing items belonging to this admin
     cursor.execute("""
-        SELECT o.*, u.name as user_name, u.email as user_email
+        SELECT DISTINCT o.*, u.name as user_name, u.email as user_email
         FROM orders o
         JOIN users u ON o.user_id = u.user_id
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE p.admin_id = ?
         ORDER BY o.created_at DESC
-    """)
+    """, (admin_id,))
     orders = cursor.fetchall()
     
     cursor.close()
@@ -1388,24 +1427,31 @@ def admin_view_order(order_id):
         flash("Admin authentication required! Please login.", "danger")
         return redirect('/admin-login')
 
+    admin_id = session['admin_id']
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT o.*, u.name as user_name, u.email as user_email
+        SELECT DISTINCT o.*, u.name as user_name, u.email as user_email
         FROM orders o
         JOIN users u ON o.user_id = u.user_id
-        WHERE o.order_id = ?
-    """, (order_id,))
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE o.order_id = ? AND p.admin_id = ?
+    """, (order_id, admin_id))
     order = cursor.fetchone()
 
     if not order:
         cursor.close()
         conn.close()
-        flash("Order not found.", "danger")
+        flash("Order not found or unauthorized access.", "danger")
         return redirect('/admin/orders')
 
-    cursor.execute("SELECT * FROM order_items WHERE order_id = ?", (order_id,))
+    cursor.execute("""
+        SELECT oi.* FROM order_items oi
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE oi.order_id = ? AND p.admin_id = ?
+    """, (order_id, admin_id))
     items = cursor.fetchall()
 
     address = None

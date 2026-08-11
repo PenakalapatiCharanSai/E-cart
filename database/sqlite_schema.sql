@@ -18,12 +18,14 @@ CREATE TABLE IF NOT EXISTS `admin` (
 
 CREATE TABLE IF NOT EXISTS `products` (
   `product_id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `admin_id` INTEGER DEFAULT 1,
   `name` TEXT,
   `description` TEXT,
   `category` TEXT,
   `price` NUMERIC,
   `image` TEXT,
-  `quantity` INTEGER DEFAULT 50
+  `quantity` INTEGER DEFAULT 50,
+  FOREIGN KEY (`admin_id`) REFERENCES `admin` (`admin_id`) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS `addresses` (
