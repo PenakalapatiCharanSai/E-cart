@@ -555,3 +555,24 @@ body.drawer-open {
         font-size: 15px;
     }
 }
+
+/* Admin Table & Container Responsiveness */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .admin-layout {
+        padding: 12px 10px;
+    }
+    .admin-table {
+        min-width: 580px;
+    }
+    .admin-table th, .admin-table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+

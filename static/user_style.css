@@ -1387,4 +1387,121 @@ body.drawer-open {
     overflow: hidden;
 }
 
+/* ==========================================
+   APP-GRADE MOBILE & DESKTOP RESPONSIVE LAYOUTS
+========================================== */
+.cart-table-desktop {
+    display: block;
+}
+
+.cart-list-mobile {
+    display: none;
+}
+
+.cart-mobile-item {
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.cart-mobile-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.cart-mobile-img {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    background: #ffffff;
+    flex-shrink: 0;
+}
+
+.cart-mobile-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.cart-mobile-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.address-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.order-success-card {
+    max-width: 760px;
+    margin: 30px auto;
+    padding: 36px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+    .cart-table-desktop {
+        display: none !important;
+    }
+    .cart-list-mobile {
+        display: flex !important;
+        flex-direction: column;
+    }
+    .address-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    .order-success-card {
+        padding: 20px 14px !important;
+        margin: 12px auto !important;
+        border-radius: var(--radius-md) !important;
+    }
+    .order-tracker {
+        overflow-x: auto;
+        padding-bottom: 12px;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start !important;
+        gap: 12px;
+        margin-bottom: 24px !important;
+    }
+    .tracker-step {
+        min-width: 70px;
+        flex: none !important;
+    }
+    .order-card-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    .order-card-right {
+        text-align: left !important;
+        align-items: flex-start !important;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #f1f5f9;
+    }
+    .order-card-actions {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+}
+
+
 

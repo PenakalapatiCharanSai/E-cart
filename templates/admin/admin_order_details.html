@@ -68,28 +68,30 @@
 <!-- Purchased Items Table Card -->
 <div class="table-card">
     <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);">Purchased Items</h3>
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>Item ID</th>
-                <th>Product Name</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th style="text-align: right;">Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in items %}
-            <tr>
-                <td>#{{ item.product_id }}</td>
-                <td><strong>{{ item.product_name }}</strong></td>
-                <td>{{ item.quantity }}</td>
-                <td>₹{{ item.price }}</td>
-                <td style="text-align: right; font-weight: 700; color: var(--text-main);">₹{{ item.price * item.quantity }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>#{{ item.product_id }}</td>
+                    <td><strong>{{ item.product_name }}</strong></td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td style="text-align: right; font-weight: 700; color: var(--text-main);">₹{{ item.price * item.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}
