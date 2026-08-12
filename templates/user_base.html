@@ -13,15 +13,15 @@
     <!-- Google Fonts with Swap Display -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- User Stylesheet (Preloaded for High Speed) -->
-    <link rel="preload" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.7" as="style">
-    <link rel="stylesheet" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.7">
+    <!-- User Stylesheet -->
+    <link rel="preload" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.8" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.8">
 
-    <!-- Non-blocking FontAwesome -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
-    <!-- Critical Path Inline CSS for 0ms Render Lag -->
+    <!-- Critical Path Inline CSS -->
     <style>
         body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f3f6; margin: 0; padding: 0; color: #111827; }
         .site-header { background: #ffffff; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
@@ -29,6 +29,76 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+
+    <!-- Amazon / Flipkart Slide-Out Side Drawer Navigation Overlay -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+    <aside class="nav-drawer" id="nav-drawer">
+        <!-- Profile Banner -->
+        <div class="drawer-header">
+            <div class="drawer-user-info">
+                <div class="drawer-avatar">
+                    {% if session.get('user_id') and session.get('user_name') %}
+                        {{ session.get('user_name')[0]|upper }}
+                    {% else %}
+                        <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="drawer-user-name">
+                        {% if session.get('user_id') %}
+                            Hello, {{ session.get('user_name') }}
+                        {% else %}
+                            Hello, Sign In
+                        {% endif %}
+                    </h3>
+                    <div class="drawer-user-status">
+                        {% if session.get('user_id') %}
+                            <i class="fas fa-shield-check" style="color: #4ade80;"></i> Verified Account
+                        {% else %}
+                            Welcome to SmartCart
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="drawer-close-btn" id="drawer-close-btn" title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Content Menu -->
+        <div class="drawer-content">
+            <div class="drawer-section-title">Shop By Department</div>
+            <a href="/user/products" class="drawer-link"><i class="fas fa-th-large"></i> All Products</a>
+            <a href="/user/products?category=Electronics" class="drawer-link"><i class="fas fa-laptop"></i> Electronics & Laptops</a>
+            <a href="/user/products?category=Fashion" class="drawer-link"><i class="fas fa-tshirt"></i> Fashion & Apparel</a>
+            <a href="/user/products?category=Mobiles" class="drawer-link"><i class="fas fa-mobile-alt"></i> Mobiles & Accessories</a>
+            <a href="/user/products?category=Home" class="drawer-link"><i class="fas fa-couch"></i> Home & Kitchen</a>
+            <a href="/user/products?category=Appliances" class="drawer-link"><i class="fas fa-plug"></i> Home Appliances</a>
+            <a href="/user/products" class="drawer-link" style="color: #ea580c; font-weight: 700;"><i class="fas fa-bolt" style="color: #ea580c;"></i> Today's Hot Deals</a>
+
+            <div class="drawer-divider"></div>
+
+            <div class="drawer-section-title">Account & Orders</div>
+            {% if session.get('user_id') %}
+                <a href="/user/account" class="drawer-link"><i class="fas fa-user-circle"></i> My Account Dashboard</a>
+                <a href="/user/my-orders" class="drawer-link"><i class="fas fa-box"></i> My Orders & Invoices</a>
+                <a href="/user/cart" class="drawer-link"><i class="fas fa-shopping-cart"></i> Shopping Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})</a>
+            {% else %}
+                <a href="/user-login" class="drawer-link"><i class="fas fa-sign-in-alt"></i> Sign In to Account</a>
+                <a href="/user-login" class="drawer-link"><i class="fas fa-user-plus"></i> Create New Account</a>
+            {% endif %}
+
+            <div class="drawer-divider"></div>
+
+            <div class="drawer-section-title">Management</div>
+            <a href="/admin-login" class="drawer-link" style="color: #6366f1;"><i class="fas fa-user-shield" style="color: #6366f1;"></i> Store Manager Portal</a>
+
+            {% if session.get('user_id') %}
+                <div class="drawer-divider"></div>
+                <a href="/user-logout" class="drawer-link" style="color: #ef4444; font-weight: 700;"><i class="fas fa-sign-out-alt" style="color: #ef4444;"></i> Sign Out</a>
+            {% endif %}
+        </div>
+    </aside>
 
     <!-- Site Header -->
     <header class="site-header">
@@ -78,40 +148,10 @@
                 </a>
                 {% endif %}
 
-                <!-- Three-Dots Menu Toggle Dropdown Button -->
-                <div class="menu-toggle-wrapper">
-                    <button type="button" class="three-dots-btn" id="menu-toggle-btn" title="More Menu Options">
-                        <i class="fas fa-ellipsis-vertical"></i>
-                    </button>
-                    
-                    <div class="three-dots-dropdown" id="three-dots-menu">
-                        <a href="/user/products" class="dropdown-item">
-                            <i class="fas fa-store" style="color: var(--brand-blue);"></i> Shop Products
-                        </a>
-
-                        {% if session.get('user_id') %}
-                            <a href="/user/account" class="dropdown-item">
-                                <i class="fas fa-user-circle" style="color: var(--brand-blue);"></i> My Account Dashboard
-                            </a>
-                            <a href="/user/my-orders" class="dropdown-item">
-                                <i class="fas fa-box" style="color: var(--brand-blue);"></i> My Orders
-                            </a>
-                            <a href="/user-logout" class="dropdown-item danger-item">
-                                <i class="fas fa-sign-out-alt"></i> Sign Out
-                            </a>
-                        {% else %}
-                            <a href="/user-login" class="dropdown-item">
-                                <i class="fas fa-sign-in-alt" style="color: var(--brand-blue);"></i> Sign In / Register
-                            </a>
-                        {% endif %}
-
-                        <div style="border-top: 1px solid var(--border-light); margin: 4px 0;"></div>
-                        
-                        <a href="/admin-login" class="dropdown-item" style="color: #6366f1;">
-                            <i class="fas fa-user-shield"></i> Admin Portal
-                        </a>
-                    </div>
-                </div>
+                <!-- Hamburger Menu (3 Lines ☰) Drawer Button -->
+                <button type="button" class="hamburger-btn" id="drawer-toggle-btn" title="Navigation Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
 
@@ -174,16 +214,16 @@
                 <i class="fas fa-user-circle" style="font-size: 18px;"></i>
                 <span>Account</span>
             </a>
-            <a href="/user/my-orders" class="mobile-nav-item">
-                <i class="fas fa-box" style="font-size: 18px;"></i>
-                <span>Orders</span>
-            </a>
         {% else %}
             <a href="/user-login" class="mobile-nav-item">
                 <i class="fas fa-user" style="font-size: 18px;"></i>
                 <span>Login</span>
             </a>
         {% endif %}
+        <button type="button" class="mobile-nav-item" id="mobile-menu-trigger" style="background: none; border: none; font-size: 12px; color: inherit; cursor: pointer;">
+            <i class="fas fa-bars" style="font-size: 18px;"></i>
+            <span>Menu</span>
+        </button>
     </div>
 
     <!-- Site Footer -->
@@ -191,26 +231,39 @@
         <p>&copy; 2026 SmartCart E-Commerce. All rights reserved. Crafted with clean modern aesthetics.</p>
     </footer>
 
-    <!-- Global Cart & Menu Script -->
+    <!-- Global Navigation Drawer & Cart Script -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const menuBtn = document.getElementById('menu-toggle-btn');
-        const menuDropdown = document.getElementById('three-dots-menu');
+        const toggleBtn = document.getElementById('drawer-toggle-btn');
+        const mobileTrigger = document.getElementById('mobile-menu-trigger');
+        const closeBtn = document.getElementById('drawer-close-btn');
+        const drawer = document.getElementById('nav-drawer');
+        const backdrop = document.getElementById('drawer-backdrop');
 
-        if(menuBtn && menuDropdown) {
-            menuBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                menuDropdown.classList.toggle('show');
-                menuBtn.classList.toggle('active');
-            });
-
-            document.addEventListener('click', function(e) {
-                if(!menuDropdown.contains(e.target) && !menuBtn.contains(e.target)) {
-                    menuDropdown.classList.remove('show');
-                    menuBtn.classList.remove('active');
-                }
-            });
+        function openDrawer() {
+            if(drawer && backdrop) {
+                drawer.classList.add('active');
+                backdrop.classList.add('active');
+                document.body.classList.add('drawer-open');
+            }
         }
+
+        function closeDrawer() {
+            if(drawer && backdrop) {
+                drawer.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.classList.remove('drawer-open');
+            }
+        }
+
+        if(toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+        if(mobileTrigger) mobileTrigger.addEventListener('click', openDrawer);
+        if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if(backdrop) backdrop.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') closeDrawer();
+        });
     });
 
     function showFlashMessage(message, category) {

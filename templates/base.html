@@ -14,8 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Admin Stylesheet (Preloaded for High Speed) -->
-    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.7" as="style">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.7">
+    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.8" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.8">
 
     <!-- Non-blocking FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -41,10 +41,10 @@
                 <i class="fas fa-store"></i> View Storefront
             </a>
 
-            <!-- Three-Dots Menu Toggle Dropdown Button -->
+            <!-- Hamburger Menu (3 Lines ☰) Toggle Dropdown Button -->
             <div class="menu-toggle-wrapper">
                 <button type="button" class="three-dots-btn" id="admin-menu-toggle-btn" title="Admin Navigation Menu">
-                    <i class="fas fa-ellipsis-vertical"></i>
+                    <i class="fas fa-bars"></i>
                 </button>
 
                 <div class="three-dots-dropdown" id="admin-three-dots-menu">
