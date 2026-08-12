@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;">
+<div class="cart-layout">
     
     <!-- Left Column: Address Selection & Add Address -->
     <div>
@@ -14,7 +14,7 @@
 
         <form action="/user/pay" method="POST" id="address-form">
             {% if addresses %}
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
                     {% for address in addresses %}
                     <label class="address-card" style="border: 2px solid {% if loop.first %}var(--brand-blue){% else %}var(--border-light){% endif %}; padding: 18px; border-radius: var(--radius-md); cursor: pointer; display: block; position: relative; background: var(--bg-card); box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
                         <input type="radio" name="address_id" value="{{ address.address_id }}" {% if loop.first %}checked{% endif %} style="position: absolute; top: 18px; right: 18px; accent-color: var(--brand-blue);">
@@ -43,7 +43,7 @@
             </h3>
 
             <form action="/user/add-address" method="POST">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div class="form-row-2">
                     <div class="form-group">
                         <label>Full Name</label>
                         <input type="text" name="full_name" placeholder="John Doe" required>
@@ -59,7 +59,7 @@
                     <textarea name="street_address" rows="2" placeholder="House no, street name, landmark" required></textarea>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div class="form-row-3">
                     <div class="form-group">
                         <label>City</label>
                         <input type="text" name="city" required>

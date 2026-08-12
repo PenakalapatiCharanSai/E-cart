@@ -18,52 +18,54 @@
         </div>
 
         <form action="/user/checkout" method="POST" id="checkout-form">
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30px;"></th>
-                        <th>Product</th>
-                        <th style="text-align: center;">Price</th>
-                        <th style="text-align: center;">Quantity</th>
-                        <th style="text-align: right;">Total</th>
-                        <th style="text-align: center;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pid, item in cart.items() %}
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="selected_items" value="{{ pid }}" class="item-checkbox" data-price="{{ item.price * item.quantity }}" checked style="accent-color: var(--brand-blue);">
-                        </td>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 14px;">
-                                <img src="/static/uploads/product_images/{{ item.image }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 4px; background: #fff;">
-                                <div>
-                                    <div style="font-weight: 700; font-size: 14px; color: var(--text-primary);">{{ item.name }}</div>
-                                    <div style="font-size: 12px; color: var(--success); font-weight: 600;"><i class="fas fa-check"></i> In Stock</div>
+            <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="cart-table" style="min-width: 580px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;"></th>
+                            <th>Product</th>
+                            <th style="text-align: center;">Price</th>
+                            <th style="text-align: center;">Quantity</th>
+                            <th style="text-align: right;">Total</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pid, item in cart.items() %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="selected_items" value="{{ pid }}" class="item-checkbox" data-price="{{ item.price * item.quantity }}" checked style="accent-color: var(--brand-blue);">
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 14px;">
+                                    <img src="/static/uploads/product_images/{{ item.image }}" alt="{{ item.name }}" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 4px; background: #fff;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 14px; color: var(--text-primary);">{{ item.name }}</div>
+                                        <div style="font-size: 12px; color: var(--success); font-weight: 600;"><i class="fas fa-check"></i> In Stock</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td style="text-align: center; font-weight: 600;">₹{{ item.price }}</td>
-                        <td style="text-align: center;">
-                            <div class="qty-control">
-                                <a href="/user/cart/decrease/{{ pid }}" class="qty-btn" title="Decrease">-</a>
-                                <span class="qty-val">{{ item.quantity }}</span>
-                                <a href="/user/cart/increase/{{ pid }}" class="qty-btn" title="Increase">+</a>
-                            </div>
-                        </td>
-                        <td style="text-align: right; font-weight: 800; color: var(--text-primary);">
-                            ₹{{ item.price * item.quantity }}
-                        </td>
-                        <td style="text-align: center;">
-                            <a href="/user/cart/remove/{{ pid }}" style="color: var(--danger); font-size: 14px; padding: 6px; text-decoration: none;" title="Remove Item">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td style="text-align: center; font-weight: 600;">₹{{ item.price }}</td>
+                            <td style="text-align: center;">
+                                <div class="qty-control">
+                                    <a href="/user/cart/decrease/{{ pid }}" class="qty-btn" title="Decrease">-</a>
+                                    <span class="qty-val">{{ item.quantity }}</span>
+                                    <a href="/user/cart/increase/{{ pid }}" class="qty-btn" title="Increase">+</a>
+                                </div>
+                            </td>
+                            <td style="text-align: right; font-weight: 800; color: var(--text-primary);">
+                                ₹{{ item.price * item.quantity }}
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="/user/cart/remove/{{ pid }}" style="color: var(--danger); font-size: 14px; padding: 6px; text-decoration: none;" title="Remove Item">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
             <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <a href="/user/products" class="btn btn-secondary" style="font-size: 13px;">
