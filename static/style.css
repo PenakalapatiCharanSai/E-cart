@@ -545,7 +545,13 @@ body.drawer-open {
     .kpi-grid {
         grid-template-columns: 1fr;
     }
-    .admin-nav-link span, .btn-admin span {
+    .admin-nav-link span, .btn-admin span, .admin-nav a span {
         display: none; /* Icon only for small screen header buttons */
+    }
+    .admin-header {
+        padding: 8px 12px;
+    }
+    .admin-brand {
+        font-size: 15px;
     }
 }

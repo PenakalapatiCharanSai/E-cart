@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - Order #{{ order.order_id }}</title>
-    <!-- Use FontAwesome for icons, standard font -->
+    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- html2pdf.js for direct PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
@@ -217,9 +219,16 @@
 </head>
 <body>
     
-    <div class="action-buttons" style="margin-top: 40px;">
-        <button class="btn" onclick="window.print()"><i class="fas fa-print"></i> Print / Download PDF</button>
-        <a href="/user/my-orders" class="btn btn-secondary" style="margin-left: 10px;"><i class="fas fa-arrow-left"></i> Back to Orders</a>
+    <div class="action-buttons" style="margin-top: 40px; display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;">
+        <button class="btn" id="download-pdf-btn" onclick="downloadInvoicePDF()" style="background-color: #2563eb;">
+            <i class="fas fa-file-pdf"></i> Download PDF Invoice
+        </button>
+        <button class="btn btn-secondary" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Invoice
+        </button>
+        <a href="/user/my-orders" class="btn btn-secondary" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Back to Orders
+        </a>
     </div>
 
     <div class="invoice-container">
@@ -311,5 +320,33 @@
             <p>If you have any questions concerning this invoice, contact our support team.</p>
         </div>
     </div>
+
+    <script>
+    function downloadInvoicePDF() {
+        const btn = document.getElementById('download-pdf-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        btn.disabled = true;
+
+        const element = document.querySelector('.invoice-container');
+        const opt = {
+            margin:       [8, 8, 8, 8],
+            filename:     'Invoice_Order_{{ order.order_id }}.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, logging: false },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(function() {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }).catch(function(err) {
+            console.error('PDF Generation error:', err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            window.print();
+        });
+    }
+    </script>
 </body>
 </html>
