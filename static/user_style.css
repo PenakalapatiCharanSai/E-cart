@@ -988,6 +988,13 @@ body {
     color: var(--brand-blue);
 }
 
+/* User Account Grid Layout */
+.user-account-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
 /* ==========================================
    RESPONSIVE DESIGN (ZERO OVERLAP GUARANTEE)
 ========================================== */
@@ -1006,6 +1013,10 @@ body {
 }
 
 @media (max-width: 768px) {
+    .user-account-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
     .header-top {
         display: flex;
         flex-wrap: wrap;
