@@ -13,11 +13,11 @@
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Admin Stylesheet (Preloaded for High Speed) -->
-    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.8" as="style">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.8">
+    <!-- Admin Stylesheet -->
+    <link rel="preload" href="{{ url_for('static', filename='style.css') }}?v=1.0.9" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.9">
 
-    <!-- Non-blocking FontAwesome -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
@@ -30,64 +30,81 @@
 </head>
 <body>
 
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <a href="/admin-dashboard" class="admin-brand">
-            <i class="fas fa-user-shield" style="font-size: 24px;"></i> SmartCart <span>Admin</span>
-        </a>
-
-        <div class="admin-nav">
-            <a href="/" class="admin-nav-link" target="_blank" title="View Storefront">
-                <i class="fas fa-store"></i> View Storefront
-            </a>
-
-            <!-- Hamburger Menu (3 Lines ☰) Toggle Dropdown Button -->
-            <div class="menu-toggle-wrapper">
-                <button type="button" class="three-dots-btn" id="admin-menu-toggle-btn" title="Admin Navigation Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
-
-                <div class="three-dots-dropdown" id="admin-three-dots-menu">
-                    <a href="/" class="dropdown-item" target="_blank">
-                        <i class="fas fa-store" style="color: var(--admin-primary);"></i> View Storefront
-                    </a>
-
-                    {% if session.get('admin_id') %}
-                        <a href="/admin-dashboard" class="dropdown-item">
-                            <i class="fas fa-chart-line" style="color: var(--admin-primary);"></i> Dashboard
-                        </a>
-                        <a href="/admin/item-list" class="dropdown-item">
-                            <i class="fas fa-boxes" style="color: var(--admin-primary);"></i> Inventory Products
-                        </a>
-                        <a href="/admin/add-item" class="dropdown-item">
-                            <i class="fas fa-plus-circle" style="color: var(--admin-primary);"></i> Add New Product
-                        </a>
-                        <a href="/admin/orders" class="dropdown-item">
-                            <i class="fas fa-shopping-cart" style="color: var(--admin-primary);"></i> Customer Orders
-                        </a>
-                        <a href="/admin/profile" class="dropdown-item">
-                            <i class="fas fa-user-circle" style="color: var(--admin-primary);"></i> Profile ({{ session.get('admin_name') }})
-                        </a>
-                        <a href="/admin-logout" class="dropdown-item danger-item">
-                            <i class="fas fa-sign-out-alt"></i> Sign Out
-                        </a>
-                    {% else %}
-                        <a href="/admin-login" class="dropdown-item">
-                            <i class="fas fa-sign-in-alt" style="color: var(--admin-primary);"></i> Admin Sign In
-                        </a>
-                        <a href="/admin-signup" class="dropdown-item">
-                            <i class="fas fa-user-plus" style="color: var(--admin-primary);"></i> Register Admin
-                        </a>
-                    {% endif %}
+    <!-- Admin Slide-Out Navigation Drawer -->
+    <div class="drawer-backdrop" id="admin-drawer-backdrop"></div>
+    <aside class="nav-drawer" id="admin-nav-drawer">
+        <div class="drawer-header">
+            <div class="drawer-user-info">
+                <div class="drawer-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h3 class="drawer-user-name">
+                        {% if session.get('admin_id') %}
+                            {{ session.get('admin_name') }}
+                        {% else %}
+                            Admin Portal
+                        {% endif %}
+                    </h3>
+                    <div class="drawer-user-status">Store Management Panel</div>
                 </div>
             </div>
+            <button type="button" class="drawer-close-btn" id="admin-drawer-close-btn" title="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="drawer-content">
+            <div class="drawer-section-title">Store Management</div>
+            {% if session.get('admin_id') %}
+                <a href="/admin-dashboard" class="drawer-link"><i class="fas fa-chart-line"></i> Dashboard Overview</a>
+                <a href="/admin/item-list" class="drawer-link"><i class="fas fa-boxes"></i> Inventory Products</a>
+                <a href="/admin/add-item" class="drawer-link"><i class="fas fa-plus-circle"></i> Add New Product</a>
+                <a href="/admin/orders" class="drawer-link"><i class="fas fa-shopping-cart"></i> Customer Orders</a>
+                <a href="/admin/profile" class="drawer-link"><i class="fas fa-cog"></i> Profile & Settings</a>
+            {% else %}
+                <a href="/admin-login" class="drawer-link"><i class="fas fa-sign-in-alt"></i> Admin Sign In</a>
+                <a href="/admin-signup" class="drawer-link"><i class="fas fa-user-plus"></i> Register New Admin</a>
+            {% endif %}
+
+            <div class="drawer-divider"></div>
+            <div class="drawer-section-title">Quick Actions</div>
+            <a href="/" class="drawer-link" target="_blank" style="color: #2563eb;"><i class="fas fa-store" style="color: #2563eb;"></i> View Customer Storefront</a>
+
+            {% if session.get('admin_id') %}
+                <div class="drawer-divider"></div>
+                <a href="/admin-logout" class="drawer-link" style="color: #ef4444; font-weight: 700;"><i class="fas fa-sign-out-alt" style="color: #ef4444;"></i> Sign Out</a>
+            {% endif %}
+        </div>
+    </aside>
+
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button type="button" class="hamburger-btn" id="admin-drawer-toggle-btn" title="Admin Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="/admin-dashboard" class="admin-brand">
+                <i class="fas fa-user-shield" style="font-size: 22px;"></i> SmartCart <span>Admin</span>
+            </a>
+        </div>
+
+        <div class="admin-nav">
+            <a href="/" class="btn-admin btn-admin-secondary" target="_blank" title="View Storefront" style="padding: 7px 12px; font-size: 13px;">
+                <i class="fas fa-store"></i> <span>Storefront</span>
+            </a>
+            {% if session.get('admin_id') %}
+                <a href="/admin-logout" class="btn-admin" style="padding: 7px 12px; font-size: 13px; color: var(--danger); text-decoration: none; font-weight: 700; background: #fef2f2; border: 1px solid #fecaca;">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            {% endif %}
         </div>
     </header>
 
     <!-- Admin Layout Container -->
     <div class="admin-layout">
         {% if session.get('admin_id') %}
-        <!-- Sidebar Navigation -->
+        <!-- Sidebar Navigation (Desktop) -->
         <aside class="admin-sidebar">
             <div class="sidebar-title">Main Navigation</div>
             <ul class="sidebar-menu">
@@ -142,28 +159,39 @@
         <p>&copy; 2026 SmartCart Store Management Portal. All rights reserved.</p>
     </footer>
 
-    {% block scripts %}{% endblock %}
-
+    <!-- Admin Drawer Toggle Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleBtn = document.getElementById('admin-menu-toggle-btn');
-            const dropdown = document.getElementById('admin-three-dots-menu');
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('admin-drawer-toggle-btn');
+        const closeBtn = document.getElementById('admin-drawer-close-btn');
+        const drawer = document.getElementById('admin-nav-drawer');
+        const backdrop = document.getElementById('admin-drawer-backdrop');
 
-            if (toggleBtn && dropdown) {
-                toggleBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    dropdown.classList.toggle('show');
-                    toggleBtn.classList.toggle('active');
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (!toggleBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                        dropdown.classList.remove('show');
-                        toggleBtn.classList.remove('active');
-                    }
-                });
+        function openDrawer() {
+            if(drawer && backdrop) {
+                drawer.classList.add('active');
+                backdrop.classList.add('active');
+                document.body.classList.add('drawer-open');
             }
+        }
+
+        function closeDrawer() {
+            if(drawer && backdrop) {
+                drawer.classList.remove('active');
+                backdrop.classList.remove('active');
+                document.body.classList.remove('drawer-open');
+            }
+        }
+
+        if(toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+        if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if(backdrop) backdrop.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') closeDrawer();
         });
+    });
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

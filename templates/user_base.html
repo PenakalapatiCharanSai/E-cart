@@ -14,8 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- User Stylesheet -->
-    <link rel="preload" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.8" as="style">
-    <link rel="stylesheet" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.8">
+    <link rel="preload" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.9" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='user_style.css') }}?v=1.0.9">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -103,14 +103,19 @@
     <!-- Site Header -->
     <header class="site-header">
         <div class="header-top">
-            <!-- Brand Logo -->
-            <a href="/" class="header-brand">
-                <div class="brand-logo">
-                    <i class="fas fa-shopping-bag"></i> Smart<span>Cart</span>
-                </div>
-            </a>
+            <!-- Header Left (3-Line Hamburger Menu + Brand Logo) -->
+            <div class="header-left">
+                <button type="button" class="hamburger-btn" id="drawer-toggle-btn" title="Navigation Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="/" class="header-brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-shopping-bag"></i> Smart<span>Cart</span>
+                    </div>
+                </a>
+            </div>
 
-            <!-- Prominent Search Bar -->
+            <!-- Prominent Search Bar (Full-Width Row on Mobile below Hamburger & Brand) -->
             <form class="header-search" method="GET" action="/user/products">
                 <select name="category" class="search-cat-select">
                     <option value="">All Categories</option>
@@ -126,7 +131,7 @@
                 </button>
             </form>
 
-            <!-- Header Actions -->
+            <!-- Header Actions (Cart, Account/Login) -->
             <div class="header-actions">
                 <!-- Cart Button -->
                 <a href="/user/cart" class="cart-icon-btn">
@@ -147,11 +152,6 @@
                     <span>Sign In</span>
                 </a>
                 {% endif %}
-
-                <!-- Hamburger Menu (3 Lines ☰) Drawer Button -->
-                <button type="button" class="hamburger-btn" id="drawer-toggle-btn" title="Navigation Menu">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
         </div>
 
